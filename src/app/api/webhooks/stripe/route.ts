@@ -1,17 +1,11 @@
+export const dynamic = "force-dynamic";
+
 import Stripe from "stripe";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdmin } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/emails";
 import { ConfirmationEmail } from "@/lib/emails/templates/ConfirmationEmail";
 import { NotificationAdminEmail } from "@/lib/emails/templates/NotificationAdminEmail";
-
-export const dynamic = "force-dynamic";
-
-function getStripe() {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
-  return new Stripe(key);
-}
 
 const forfaitPrix: Record<string, number> = {
   decouverte: 120,
@@ -22,48 +16,64 @@ const forfaitPrix: Record<string, number> = {
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
-  if (!sig)
-    return NextResponse.json({ error: "Signature manquante" }, { status: 400 });
 
+  if (!sig) {
+    return NextResponse.json({ error: "No signature" }, { status: 400 });
+  }
+
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
   let event: Stripe.Event;
   try {
-    event = getStripe().webhooks.constructEvent(
+    event = stripe.webhooks.constructEvent(
       body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
-  } catch {
-    return NextResponse.json({ error: "Webhook invalide" }, { status: 400 });
+  } catch (err) {
+    console.error("Webhook signature error:", err);
+    return NextResponse.json(
+      { error: `Webhook Error: ${err}` },
+      { status: 400 }
+    );
   }
 
   const supabase = createSupabaseAdmin();
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
+
+    console.log("Checkout session completed:", session.id);
+    console.log("Metadata:", session.metadata);
+
     const clerk_user_id = session.metadata?.clerk_user_id;
     const forfait = session.metadata?.forfait;
-    const type = session.metadata?.type;
+    const type = session.metadata?.type ?? "unique";
 
-    if (clerk_user_id && forfait && type) {
-      await supabase.from("purchases").insert({
-        clerk_user_id,
-        forfait,
-        type,
-        stripe_session_id: session.id,
-        stripe_customer_id:
-          typeof session.customer === "string" ? session.customer : null,
-        stripe_subscription_id:
-          typeof session.subscription === "string"
-            ? session.subscription
-            : null,
-        status: "active",
-        expires_at:
-          type === "mensuel"
-            ? new Date(
-                Date.now() + 31 * 24 * 60 * 60 * 1000
-              ).toISOString()
-            : null,
-      });
+    if (!clerk_user_id || !forfait) {
+      console.error("Missing metadata:", { clerk_user_id, forfait, type });
+      return NextResponse.json({ error: "Missing metadata" }, { status: 400 });
+    }
+
+    const { error: insertError } = await supabase.from("purchases").insert({
+      clerk_user_id,
+      forfait,
+      type: type ?? "unique",
+      stripe_session_id: session.id,
+      stripe_customer_id:
+        (session.customer as string) ?? null,
+      stripe_subscription_id:
+        (session.subscription as string) ?? null,
+      status: "active",
+      expires_at:
+        type === "mensuel"
+          ? new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString()
+          : null,
+    });
+
+    if (insertError) {
+      console.error("Supabase insert error:", insertError);
+    } else {
+      console.log("Purchase inserted successfully");
 
       const { data: profile } = await supabase
         .from("profiles")
@@ -75,7 +85,7 @@ export async function POST(req: NextRequest) {
       const contactEmail = process.env.CONTACT_EMAIL ?? "contact@qalam.academy";
 
       if (profile?.email) {
-        await sendEmail({
+        sendEmail({
           to: profile.email,
           subject: `✒️ Confirmation — Forfait ${forfait} activé — Qalam`,
           template: ConfirmationEmail({
@@ -85,15 +95,17 @@ export async function POST(req: NextRequest) {
             price: forfaitPrix[forfait] ?? 0,
             siteUrl,
           }),
-        });
+        }).catch(() => {});
       }
 
       if (profile && contactEmail) {
-        await sendEmail({
+        sendEmail({
           to: contactEmail,
           subject: `💰 Nouveau paiement — ${profile.first_name ?? ""} — ${forfait}`,
           template: NotificationAdminEmail({
-            senderName: [profile.first_name, profile.last_name].filter(Boolean).join(" ") || "Élève",
+            senderName:
+              [profile.first_name, profile.last_name].filter(Boolean).join(" ") ||
+              "Élève",
             senderEmail: profile.email,
             subject: `Paiement ${forfait} (${type})`,
             message: "Nouveau paiement confirmé par Stripe.",
@@ -101,28 +113,30 @@ export async function POST(req: NextRequest) {
             receivedAt: new Date().toLocaleString("fr-FR"),
             adminUrl: siteUrl,
           }),
-        });
+        }).catch(() => {});
       }
     }
   }
 
   if (event.type === "invoice.payment_succeeded") {
-    const invoice = event.data.object as Stripe.Invoice & { subscription?: string };
-    const sub = invoice.subscription;
+    const invoice = event.data.object as Stripe.Invoice & {
+      subscription?: string | { id?: string };
+    };
+    const sub =
+      typeof invoice.subscription === "string"
+        ? invoice.subscription
+        : (invoice.subscription as { id?: string } | undefined)?.id;
     if (sub) {
-      const subId = typeof sub === "string" ? sub : (sub as { id?: string })?.id;
-      if (subId) {
-        await supabase
-          .from("purchases")
-          .update({
-            status: "active",
-            expires_at: new Date(
-              Date.now() + 31 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-            updated_at: new Date().toISOString(),
-          })
-          .eq("stripe_subscription_id", subId);
-      }
+      await supabase
+        .from("purchases")
+        .update({
+          status: "active",
+          expires_at: new Date(
+            Date.now() + 31 * 24 * 60 * 60 * 1000
+          ).toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("stripe_subscription_id", sub);
     }
   }
 
@@ -130,7 +144,10 @@ export async function POST(req: NextRequest) {
     const sub = event.data.object as Stripe.Subscription;
     await supabase
       .from("purchases")
-      .update({ status: "cancelled", updated_at: new Date().toISOString() })
+      .update({
+        status: "cancelled",
+        updated_at: new Date().toISOString(),
+      })
       .eq("stripe_subscription_id", sub.id);
   }
 

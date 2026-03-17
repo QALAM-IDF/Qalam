@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Stripe from "stripe";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";

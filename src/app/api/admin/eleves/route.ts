@@ -11,40 +11,36 @@ export async function GET() {
 
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("clerk_user_id, email, first_name, last_name, created_at");
+      .select("*")
+      .order("created_at", { ascending: false });
 
-    const { data: purchases } = await supabase
-      .from("purchases")
-      .select("clerk_user_id, forfait, status, purchased_at, type")
-      .eq("status", "active")
-      .order("purchased_at", { ascending: false });
+    if (!profiles) return NextResponse.json({ eleves: [] });
 
-    const byUser = new Map<string, { forfait: string; status: string; purchased_at: string; type: string }>();
-    for (const p of purchases ?? []) {
-      if (!byUser.has(p.clerk_user_id)) {
-        byUser.set(p.clerk_user_id, {
-          forfait: p.forfait,
-          status: p.status,
-          purchased_at: p.purchased_at,
-          type: p.type,
-        });
-      }
-    }
+    const elevesWithForfait = await Promise.all(
+      profiles.map(async (profile) => {
+        const { data: purchase } = await supabase
+          .from("purchases")
+          .select("forfait, type, status, purchased_at, expires_at")
+          .eq("clerk_user_id", profile.clerk_user_id)
+          .eq("status", "active")
+          .order("purchased_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
-    const eleves = (profiles ?? []).map((pr) => ({
-      clerk_user_id: pr.clerk_user_id,
-      email: pr.email,
-      first_name: pr.first_name ?? "",
-      last_name: pr.last_name ?? "",
-      forfait: byUser.get(pr.clerk_user_id)?.forfait ?? null,
-      status: byUser.get(pr.clerk_user_id)?.status ?? null,
-      purchased_at: byUser.get(pr.clerk_user_id)?.purchased_at ?? null,
-      type: byUser.get(pr.clerk_user_id)?.type ?? null,
-      created_at: pr.created_at,
-    }));
+        return {
+          ...profile,
+          forfait: purchase?.forfait ?? null,
+          forfait_type: purchase?.type ?? null,
+          forfait_status: purchase?.status ?? null,
+          purchased_at: purchase?.purchased_at ?? null,
+          expires_at: purchase?.expires_at ?? null,
+        };
+      })
+    );
 
-    return NextResponse.json(eleves);
-  } catch {
+    return NextResponse.json({ eleves: elevesWithForfait });
+  } catch (error) {
+    console.error("GET eleves error:", error);
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   }
 }
