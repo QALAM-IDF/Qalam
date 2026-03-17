@@ -63,6 +63,8 @@ export default function NavBar() {
 
   const isDarkPage = pathname === "/hommes" || pathname === "/enfants";
 
+  if (pathname?.startsWith("/admin")) return null;
+
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${

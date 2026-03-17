@@ -22,6 +22,8 @@ export default async function AdminLayout({
         display: "flex",
         minHeight: "100vh",
         background: "#0f0f0f",
+        position: "relative",
+        zIndex: 100,
       }}
     >
       <aside
@@ -34,7 +36,7 @@ export default async function AdminLayout({
           top: 0,
           left: 0,
           height: "100vh",
-          zIndex: 50,
+          zIndex: 200,
           overflowY: "auto",
           background: "#111111",
           borderRight: "1px solid #2a2a2a",

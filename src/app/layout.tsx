@@ -6,10 +6,9 @@ import { Analytics } from "@vercel/analytics/react";
 import { defaultMetadata } from "@/lib/seo";
 import { organizationJsonLd } from "@/lib/seo";
 import "@/styles/globals.css";
-import NavBar from "@/components/ui/NavBar";
-import Footer from "@/components/ui/Footer";
 import CustomCursor from "@/components/shared/CustomCursor";
 import PageTransition from "@/components/PageTransition";
+import { ConditionalLayout } from "@/components/ConditionalLayout";
 
 const amiri = Amiri({
   weight: ["400", "700"],
@@ -56,9 +55,9 @@ export default function RootLayout({
       <html lang="fr">
         <body className={`${amiri.variable} ${cormorant.variable} ${lato.variable} ${nunito.variable} antialiased`}>
           <CustomCursor />
-          <NavBar />
-          <PageTransition>{children}</PageTransition>
-          <Footer />
+          <ConditionalLayout>
+            <PageTransition>{children}</PageTransition>
+          </ConditionalLayout>
           <Script
             id="organization-schema"
             type="application/ld+json"

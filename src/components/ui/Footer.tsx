@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { QalamLogo } from "@/components/shared/QalamLogo";
 import ArabicPattern from "@/components/shared/ArabicPattern";
 
 export default function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith("/admin")) return null;
+
   return (
     <footer
       id="contact"
