@@ -8,6 +8,7 @@ import CalligraphyDivider from "@/components/shared/CalligraphyDivider";
 import { client, hasSanityConfig } from "@/sanity/lib/client";
 import { featuredPostsQuery } from "@/sanity/lib/queries";
 import ArticleCard from "@/components/blog/ArticleCard";
+import HomeTeachersPreview from "@/components/about/HomeTeachersPreview";
 import type { SanityPostListItem } from "@/types/sanity";
 
 const levels = [
@@ -107,6 +108,8 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      <HomeTeachersPreview />
     </main>
   );
 }

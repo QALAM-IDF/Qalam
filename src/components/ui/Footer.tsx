@@ -22,6 +22,7 @@ export default function Footer() {
           <Link href="/hommes" className="text-sm text-[var(--encre-douce)]">Cours Hommes</Link>
           <Link href="/femmes" className="text-sm text-[var(--encre-douce)]">Cours Femmes</Link>
           <Link href="/enfants" className="text-sm text-[var(--encre-douce)]">Cours Enfants</Link>
+          <Link href="/a-propos" className="text-sm text-[var(--encre-douce)]">À propos</Link>
         </div>
         <p className="text-sm text-[var(--encre-douce)]">contact@qalam.academy</p>
         <p className="text-xs text-[var(--encre-douce)]">

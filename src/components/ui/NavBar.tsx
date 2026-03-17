@@ -16,6 +16,7 @@ const links = [
   { href: "/enfants", label: "Enfants" },
   { href: "/tarifs", label: "Tarifs" },
   { href: "/blog", label: "Blog" },
+  { href: "/a-propos", label: "À propos" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -26,6 +27,7 @@ const accents: Record<string, string> = {
   "/enfants": "var(--magie-turquoise)",
   "/tarifs": "var(--or-luxe)",
   "/blog": "var(--or-luxe)",
+  "/a-propos": "var(--or-luxe)",
 };
 
 export default function NavBar() {
