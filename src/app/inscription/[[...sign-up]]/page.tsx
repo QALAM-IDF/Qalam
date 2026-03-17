@@ -12,10 +12,12 @@ export default function InscriptionPage() {
             انضم إلينا
           </p>
           <h1 className="font-display text-4xl" style={{ color: "var(--encre-noire)" }}>
-            Inscription à Qalam
+            Créer un compte Qalam
           </h1>
         </div>
         <SignUp
+          forceRedirectUrl="/auth-redirect"
+          fallbackRedirectUrl="/auth-redirect"
           appearance={{
             variables: {
               colorPrimary: "#b8860b",
@@ -28,8 +30,6 @@ export default function InscriptionPage() {
             },
             elements: {
               card: "shadow-none border border-[#d4af3740]",
-              formButtonPrimary:
-                "bg-[var(--or-luxe)] hover:bg-[var(--or-brillant)]",
             },
           }}
         />

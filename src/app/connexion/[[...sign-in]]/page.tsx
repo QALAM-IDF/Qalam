@@ -16,6 +16,8 @@ export default function ConnexionPage() {
           </h1>
         </div>
         <SignIn
+          forceRedirectUrl="/auth-redirect"
+          fallbackRedirectUrl="/auth-redirect"
           appearance={{
             variables: {
               colorPrimary: "#b8860b",
@@ -28,8 +30,6 @@ export default function ConnexionPage() {
             },
             elements: {
               card: "shadow-none border border-[#d4af3740]",
-              formButtonPrimary:
-                "bg-[var(--or-luxe)] hover:bg-[var(--or-brillant)]",
             },
           }}
         />
