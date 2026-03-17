@@ -108,6 +108,40 @@ body:has(.prof-layout) {
   cursor: auto !important;
 }
 
+/* Curseur normal sur toutes les zones app (admin, prof, membre) */
+body:has(.admin-layout),
+body:has(.prof-layout),
+body:has(.membre-layout) {
+  cursor: auto !important;
+}
+
+.admin-layout *,
+.prof-layout *,
+.membre-layout * {
+  cursor: auto;
+}
+
+.admin-layout a,
+.admin-layout button,
+.admin-layout select,
+.admin-layout input,
+.admin-layout textarea,
+.admin-layout [role="button"],
+.prof-layout a,
+.prof-layout button,
+.prof-layout select,
+.prof-layout input,
+.prof-layout textarea,
+.prof-layout [role="button"],
+.membre-layout a,
+.membre-layout button,
+.membre-layout select,
+.membre-layout input,
+.membre-layout textarea,
+.membre-layout [role="button"] {
+  cursor: pointer !important;
+}
+
 a {
   color: inherit;
   text-decoration: none;

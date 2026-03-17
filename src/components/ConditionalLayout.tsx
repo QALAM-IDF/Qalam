@@ -11,10 +11,17 @@ export function ConditionalLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith("/admin");
-  const isProf = pathname?.startsWith("/professeur");
+  const isHidden =
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/professeur") ||
+    pathname?.startsWith("/espace-membre") ||
+    pathname === "/connexion" ||
+    pathname === "/inscription" ||
+    pathname === "/auth-redirect" ||
+    pathname === "/choisir-forfait" ||
+    pathname === "/paiement-succes";
 
-  if (isAdmin || isProf) {
+  if (isHidden) {
     return <>{children}</>;
   }
 

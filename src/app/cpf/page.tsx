@@ -312,6 +312,7 @@ export default function CpfPage() {
               ))}
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-4">
+              {/* TODO: remplacer par vrai lien formation Arabe CPF */}
               <a
                 href="#"
                 className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-display text-sm font-medium transition-opacity hover:opacity-90"
@@ -377,6 +378,7 @@ export default function CpfPage() {
               ))}
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-4">
+              {/* TODO: remplacer par vrai lien formation Anglais CPF */}
               <a
                 href="#"
                 className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-display text-sm font-medium transition-opacity hover:opacity-90"
@@ -488,6 +490,7 @@ export default function CpfPage() {
           directement à Mon Compte Formation.
         </p>
         <div className="mx-auto mt-10 flex max-w-2xl flex-col gap-4 sm:flex-row sm:justify-center">
+          {/* TODO: remplacer par vrai lien Mon Compte Formation Arabe */}
           <a
             href="#"
             id="lien-cpf-arabe"
@@ -501,6 +504,7 @@ export default function CpfPage() {
           >
             🎓 S&apos;inscrire avec mon CPF — Arabe
           </a>
+          {/* TODO: remplacer par vrai lien Mon Compte Formation Anglais */}
           <a
             href="#"
             id="lien-cpf-anglais"

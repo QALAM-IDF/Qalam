@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { forfaits } from "@/data/forfaits";
 import { QalamLogo } from "@/components/shared/QalamLogo";
@@ -12,6 +12,13 @@ export default function ChoisirForfaitClient() {
   const [type, setType] = useState<PaymentType>("unique");
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (redirectUrl) {
+      window.location.href = redirectUrl;
+    }
+  }, [redirectUrl]);
 
   const handleChoisir = async (forfaitId: string) => {
     setLoading(forfaitId);
@@ -27,7 +34,7 @@ export default function ChoisirForfaitClient() {
       const data = await res.json();
 
       if (data.url) {
-        window.location.href = data.url;
+        setRedirectUrl(data.url);
       } else {
         setError("Erreur lors de la création du paiement. Réessayez.");
         setLoading(null);
@@ -172,6 +179,7 @@ export default function ChoisirForfaitClient() {
                   Débutant → Avancé → Coranique. Modules certifiés, professeurs
                   natifs.
                 </p>
+                {/* TODO: remplacer par vrai lien CPF Arabe */}
                 <a
                   href="#"
                   target="_blank"
@@ -213,6 +221,7 @@ export default function ChoisirForfaitClient() {
                   Débutant → Business. Modules adaptés à vos objectifs
                   professionnels.
                 </p>
+                {/* TODO: remplacer par vrai lien CPF Anglais */}
                 <a
                   href="#"
                   target="_blank"

@@ -42,9 +42,6 @@ export async function POST(req: NextRequest) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
 
-    console.log("Checkout session completed:", session.id);
-    console.log("Metadata:", session.metadata);
-
     const clerk_user_id = session.metadata?.clerk_user_id;
     const forfait = session.metadata?.forfait;
     const type = session.metadata?.type ?? "unique";
@@ -73,8 +70,6 @@ export async function POST(req: NextRequest) {
     if (insertError) {
       console.error("Supabase insert error:", insertError);
     } else {
-      console.log("Purchase inserted successfully");
-
       const { data: profile } = await supabase
         .from("profiles")
         .select("email, first_name, last_name")

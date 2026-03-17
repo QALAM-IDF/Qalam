@@ -84,7 +84,7 @@ export default async function EspaceMembreLayout({
         }}
       >
         <div
-          className="min-h-screen"
+          className="membre-layout min-h-screen"
           style={{ backgroundColor: "var(--beige-creme)" }}
         >
           <MemberSidebar />

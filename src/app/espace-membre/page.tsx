@@ -39,11 +39,13 @@ export default function EspaceMembrePage() {
 
   useEffect(() => {
     if (!forfait) {
-      setCourses([]);
-      setCoursesLoading(false);
+      queueMicrotask(() => {
+        setCourses([]);
+        setCoursesLoading(false);
+      });
       return;
     }
-    setCoursesLoading(true);
+    queueMicrotask(() => setCoursesLoading(true));
     fetch(`/api/courses?forfait=${encodeURIComponent(forfait)}`)
       .then((r) => r.json())
       .then((data) => setCourses(Array.isArray(data) ? data : []))
@@ -72,9 +74,10 @@ export default function EspaceMembrePage() {
     (progression ?? []).reduce((s, p) => s + (p.watch_time_seconds ?? 0), 0) / 3600
   );
   const joinedAt = profile?.created_at ? new Date(profile.created_at) : new Date();
+  const [mountedAt] = useState(() => Date.now());
   const daysSinceJoin = Math.max(
     0,
-    Math.floor((Date.now() - joinedAt.getTime()) / (24 * 60 * 60 * 1000))
+    Math.floor((mountedAt - joinedAt.getTime()) / (24 * 60 * 60 * 1000))
   );
 
   return (

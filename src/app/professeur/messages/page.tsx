@@ -17,13 +17,10 @@ export default function ProfesseurMessagesPage() {
   const nomParam = searchParams.get("nom") ?? "";
 
   const [eleves, setEleves] = useState<Eleve[]>([]);
-  const [selectedEmail, setSelectedEmail] = useState(toParam);
-  const [selectedNom, setSelectedNom] = useState(nomParam);
-
-  useEffect(() => {
-    if (toParam) setSelectedEmail(toParam);
-    if (nomParam) setSelectedNom(nomParam);
-  }, [toParam, nomParam]);
+  const [listSelectedEmail, setListSelectedEmail] = useState("");
+  const [listSelectedNom, setListSelectedNom] = useState("");
+  const selectedEmail = toParam || listSelectedEmail;
+  const selectedNom = nomParam || listSelectedNom;
 
   useEffect(() => {
     fetch("/api/professeur/eleves")
@@ -60,8 +57,8 @@ export default function ProfesseurMessagesPage() {
                     key={e.clerk_user_id}
                     type="button"
                     onClick={() => {
-                      setSelectedEmail(email);
-                      setSelectedNom(name);
+                      setListSelectedEmail(email);
+                      setListSelectedNom(name);
                     }}
                     className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors"
                     style={{

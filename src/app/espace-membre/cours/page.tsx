@@ -23,11 +23,13 @@ export default function CoursPage() {
 
   useEffect(() => {
     if (!forfait) {
-      setCourses([]);
-      setLoading(false);
+      queueMicrotask(() => {
+        setCourses([]);
+        setLoading(false);
+      });
       return;
     }
-    setLoading(true);
+    queueMicrotask(() => setLoading(true));
     fetch(`/api/courses?forfait=${encodeURIComponent(forfait)}`)
       .then((r) => r.json())
       .then((data) => setCourses(Array.isArray(data) ? data : []))
