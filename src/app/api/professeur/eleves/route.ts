@@ -20,6 +20,9 @@ export async function GET() {
       .maybeSingle();
 
     const specialites = (profProfile?.specialites as string[] | null) ?? [];
+    if (specialites.length === 0) {
+      return NextResponse.json({ eleves: [] });
+    }
 
     const { data: assignments } = await supabase
       .from("prof_eleves")
@@ -49,6 +52,8 @@ export async function GET() {
         .eq("clerk_user_id", eid)
         .maybeSingle();
       if (!profile) continue;
+      const profileUnivers = (profile as { univers?: string }).univers;
+      if (profileUnivers && !specialites.includes(profileUnivers)) continue;
 
       const { data: purchase } = await supabase
         .from("purchases")

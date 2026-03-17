@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdmin } from "@/lib/supabase/server";
+import { logAccess, LOG_ACTIONS } from "@/lib/logging";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,7 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
 
+  logAccess(userId, LOG_ACTIONS.COMPLETE_LESSON, `lesson:${lessonId}`, req).catch(() => {});
   return NextResponse.json({ success: true });
 }
 

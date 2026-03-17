@@ -19,14 +19,15 @@ export async function GET() {
       .maybeSingle();
 
     const specialites = (profProfile?.specialites as string[] | null) ?? [];
-    const universFilter =
-      specialites.length > 0 ? specialites : ["hommes", "femmes", "enfants", "mixte"];
+    if (specialites.length === 0) {
+      return NextResponse.json({ courses: [] });
+    }
 
     const { data: courses } = await supabase
       .from("courses")
       .select("*, lessons(id, title, title_ar, order_index)")
       .eq("published", true)
-      .in("univers", universFilter)
+      .in("univers", [...specialites, "mixte"])
       .order("created_at", { ascending: false });
 
     return NextResponse.json({ courses: courses ?? [] });

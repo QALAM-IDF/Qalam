@@ -6,6 +6,7 @@ import { createSupabaseAdmin } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/emails";
 import { ConfirmationEmail } from "@/lib/emails/templates/ConfirmationEmail";
 import { NotificationAdminEmail } from "@/lib/emails/templates/NotificationAdminEmail";
+import { logAccess, LOG_ACTIONS } from "@/lib/logging";
 
 const forfaitPrix: Record<string, number> = {
   decouverte: 120,
@@ -70,6 +71,7 @@ export async function POST(req: NextRequest) {
     if (insertError) {
       console.error("Supabase insert error:", insertError);
     } else {
+      logAccess(clerk_user_id, LOG_ACTIONS.PURCHASE, `forfait:${forfait}`, req).catch(() => {});
       const { data: profile } = await supabase
         .from("profiles")
         .select("email, first_name, last_name")

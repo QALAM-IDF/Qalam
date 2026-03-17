@@ -14,6 +14,7 @@ type Eleve = {
   purchased_at: string | null;
   expires_at: string | null;
   role?: string | null;
+  is_admin?: boolean;
 };
 
 const forfaitColors: Record<string, { bg: string; color: string }> = {
@@ -89,6 +90,48 @@ function RoleButton({
         {loading ? "…" : role === "professeur" ? "→ Élève" : "→ Prof"}
       </button>
     </div>
+  );
+}
+
+function AdminButton({
+  eleveId,
+  isAdmin: isAdminUser,
+  onUpdate,
+}: {
+  eleveId: string;
+  isAdmin: boolean;
+  onUpdate: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+
+  const toggle = async () => {
+    setLoading(true);
+    const res = await fetch(`/api/admin/eleves/${eleveId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_admin: !isAdminUser }),
+    });
+    if (res.ok) onUpdate();
+    setLoading(false);
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      disabled={loading}
+      style={{
+        padding: "4px 10px",
+        borderRadius: "6px",
+        fontSize: "0.75rem",
+        cursor: "pointer",
+        border: "none",
+        background: isAdminUser ? "#2a1515" : "rgba(212, 175, 55, 0.2)",
+        color: isAdminUser ? "#f87171" : "var(--or-brillant)",
+      }}
+    >
+      {loading ? "…" : isAdminUser ? "Révoquer Admin" : "→ Admin"}
+    </button>
   );
 }
 
@@ -182,6 +225,7 @@ export default function ElevesAdminPage() {
                   "Type",
                   "Statut",
                   "Rôle",
+                  "Admin",
                   "Inscrit le",
                 ].map((h) => (
                   <th
@@ -301,6 +345,17 @@ export default function ElevesAdminPage() {
                     <RoleButton
                       eleveId={eleve.clerk_user_id}
                       currentRole={eleve.role ?? "eleve"}
+                      onUpdate={() => {
+                        fetch("/api/admin/eleves")
+                          .then((r) => r.json())
+                          .then((data) => setEleves(data.eleves ?? []));
+                      }}
+                    />
+                  </td>
+                  <td style={{ padding: "14px 16px" }}>
+                    <AdminButton
+                      eleveId={eleve.clerk_user_id}
+                      isAdmin={Boolean(eleve.is_admin)}
                       onUpdate={() => {
                         fetch("/api/admin/eleves")
                           .then((r) => r.json())

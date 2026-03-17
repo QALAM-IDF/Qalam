@@ -53,7 +53,18 @@ export default async function EspaceMembreLayout({
       console.error("getUserProgression error:", e);
     }
 
-    if (!forfait && !isProfOrAdmin) redirect("/choisir-forfait");
+    if (!forfait && !isProfOrAdmin) {
+      const supabase = (await import("@/lib/supabase/server")).createSupabaseAdmin();
+      const { data: expiredPurchase } = await supabase
+        .from("purchases")
+        .select("forfait")
+        .eq("clerk_user_id", userId)
+        .eq("status", "expired")
+        .limit(1)
+        .maybeSingle();
+      if (expiredPurchase) redirect("/abonnement-expire");
+      redirect("/choisir-forfait");
+    }
 
     const effectiveForfait = forfait ?? (isProfOrAdmin ? "intensif" : null);
 

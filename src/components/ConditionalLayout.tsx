@@ -19,7 +19,8 @@ export function ConditionalLayout({
     pathname === "/inscription" ||
     pathname === "/auth-redirect" ||
     pathname === "/choisir-forfait" ||
-    pathname === "/paiement-succes";
+    pathname === "/paiement-succes" ||
+    pathname === "/abonnement-expire";
 
   if (isHidden) {
     return <>{children}</>;

@@ -37,9 +37,9 @@ export default function ProgressionPage() {
       return;
     }
     queueMicrotask(() => setLoading(true));
-    fetch(`/api/courses?forfait=${encodeURIComponent(forfait)}`)
+    fetch("/api/courses")
       .then((r) => r.json())
-      .then((data) => setCourses(Array.isArray(data) ? data : []))
+      .then((data) => setCourses(Array.isArray(data?.courses) ? data.courses : []))
       .catch(() => setCourses([]))
       .finally(() => setLoading(false));
   }, [forfait]);

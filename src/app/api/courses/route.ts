@@ -1,28 +1,30 @@
 export const dynamic = "force-dynamic";
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { getUserForfait, getUserRole } from "@/lib/user";
+import { isAdmin } from "@/lib/admin";
 import { getCoursesByForfait } from "@/lib/courses";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
-    const forfait = req.nextUrl.searchParams.get("forfait");
+    let forfait = await getUserForfait(userId);
     if (!forfait) {
-      return NextResponse.json(
-        { error: "Paramètre forfait requis" },
-        { status: 400 }
-      );
+      const role = await getUserRole(userId);
+      const admin = await isAdmin();
+      if (role === "professeur" || admin) forfait = "intensif";
+    }
+    if (!forfait) {
+      return NextResponse.json({ courses: [], reason: "no_forfait" });
     }
     const courses = await getCoursesByForfait(forfait);
-    return NextResponse.json(courses);
-  } catch {
-    return NextResponse.json(
-      { error: "Erreur serveur" },
-      { status: 500 }
-    );
+    return NextResponse.json({ courses, forfait });
+  } catch (error) {
+    console.error("GET courses error:", error);
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

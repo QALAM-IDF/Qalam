@@ -53,7 +53,7 @@ export async function getUserRole(clerkUserId: string): Promise<string> {
   }
 }
 
-export async function getUserForfait(clerkUserId: string) {
+export async function getUserForfait(clerkUserId: string): Promise<string | null> {
   try {
     const supabase = createSupabaseAdmin();
 
@@ -69,7 +69,15 @@ export async function getUserForfait(clerkUserId: string) {
     if (error || !data) return null;
 
     if (data.type === "mensuel" && data.expires_at) {
-      if (new Date(data.expires_at) < new Date()) return null;
+      const expired = new Date(data.expires_at) < new Date();
+      if (expired) {
+        await supabase
+          .from("purchases")
+          .update({ status: "expired", updated_at: new Date().toISOString() })
+          .eq("clerk_user_id", clerkUserId)
+          .eq("status", "active");
+        return null;
+      }
     }
 
     return data.forfait ?? null;

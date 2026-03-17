@@ -11,6 +11,7 @@ import {
   Globe,
   LogOut,
   PlusCircle,
+  FileSearch,
 } from "lucide-react";
 import { SignOutButton } from "@clerk/nextjs";
 import { QalamLogo } from "@/components/shared/QalamLogo";
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/admin/eleves", label: "Élèves", icon: Users },
   { href: "/admin/paiements", label: "Paiements", icon: CreditCard },
   { href: "/admin/messages", label: "Messages", icon: Mail },
+  { href: "/admin/logs", label: "Logs", icon: FileSearch },
 ];
 
 export function AdminSidebar() {
