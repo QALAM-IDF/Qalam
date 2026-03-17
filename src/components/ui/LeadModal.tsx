@@ -85,35 +85,38 @@ export default function LeadModal({
             onClick={handleClose}
             style={{
               position: "fixed",
-              inset: 0,
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
               background: "rgba(0,0,0,0.6)",
               zIndex: 9998,
               backdropFilter: "blur(4px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "16px",
             }}
-          />
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ duration: 0.25 }}
-            style={{
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              zIndex: 9999,
-              width: "100%",
-              maxWidth: "520px",
-              maxHeight: "90vh",
-              overflowY: "auto",
-              background: "var(--blanc-ivoire)",
-              borderRadius: "16px",
-              padding: "32px",
-              boxShadow: "0 25px 60px rgba(0,0,0,0.3)",
-            }}
-            onClick={(e) => e.stopPropagation()}
           >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.25 }}
+              style={{
+                position: "relative",
+                zIndex: 9999,
+                width: "100%",
+                maxWidth: "520px",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                background: "var(--blanc-ivoire)",
+                borderRadius: "16px",
+                padding: "32px",
+                boxShadow: "0 25px 60px rgba(0,0,0,0.3)",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
             <div
               style={{
                 display: "flex",
@@ -321,6 +324,7 @@ export default function LeadModal({
                 </button>
               </>
             )}
+            </motion.div>
           </motion.div>
         </>
       )}
