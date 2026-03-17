@@ -44,19 +44,20 @@ export async function PUT(req: NextRequest, { params }: Params) {
       lessons,
     } = body;
 
-    if (title !== undefined) {
+    const courseUpdate: Record<string, unknown> = {};
+    if (title != null) courseUpdate.title = title;
+    if (title_ar != null) courseUpdate.title_ar = title_ar;
+    if (level != null) courseUpdate.level = level;
+    if (forfait != null) courseUpdate.forfait = forfait;
+    if (univers != null) courseUpdate.univers = univers;
+    if (description != null) courseUpdate.description = description;
+    if (total_hours != null) courseUpdate.total_hours = total_hours;
+    if (published != null) courseUpdate.published = published;
+
+    if (Object.keys(courseUpdate).length > 0) {
       const { error } = await supabase
         .from("courses")
-        .update({
-          ...(title != null && { title }),
-          ...(title_ar != null && { title_ar }),
-          ...(level != null && { level }),
-          ...(forfait != null && { forfait }),
-          ...(univers != null && { univers }),
-          ...(description != null && { description }),
-          ...(total_hours != null && { total_hours }),
-          ...(published != null && { published }),
-        })
+        .update(courseUpdate)
         .eq("id", id);
       if (error) throw error;
     }

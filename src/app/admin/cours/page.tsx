@@ -8,6 +8,7 @@ import { PlusCircle, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 type Course = {
   id: string;
   title: string;
+  title_ar?: string | null;
   level: string;
   forfait: string;
   published: boolean;
@@ -20,23 +21,67 @@ const forfaitLabel: Record<string, string> = {
   intensif: "Intensif",
 };
 
+function PublishButton({
+  courseId,
+  published,
+  onToggle,
+}: {
+  courseId: string;
+  published: boolean;
+  onToggle: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/courses/${courseId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ published: !published }),
+      });
+      if (res.ok) onToggle();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={loading}
+      className="flex items-center gap-1 rounded px-2 py-1 text-xs"
+      style={{
+        background: published ? "#0a2a0a" : "#2a1010",
+        color: published ? "#4ade80" : "#f87171",
+        border: "none",
+        cursor: loading ? "not-allowed" : "pointer",
+      }}
+    >
+      {loading ? "…" : published ? "Dépublier" : "Publier"}
+    </button>
+  );
+}
+
 export default function AdminCoursPage() {
   const [courses, setCourses] = useState<Course[]>([]);
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<string>("tous");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/admin/courses")
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data)) setCourses(data);
+        const list = data?.courses ?? (Array.isArray(data) ? data : []);
+        setCourses(list);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
 
   const filtered =
-    filter === ""
+    filter === "tous" || filter === ""
       ? courses
       : courses.filter((c) => c.forfait === filter);
 
@@ -59,7 +104,20 @@ export default function AdminCoursPage() {
   };
 
   const columns: { key: keyof Course | string; label: string; render?: (value: unknown, row: Course) => React.ReactNode }[] = [
-    { key: "title", label: "Titre" },
+    {
+      key: "title",
+      label: "Titre",
+      render: (_, row) => (
+        <div>
+          <div style={{ fontWeight: 600, color: "#fff" }}>{row.title}</div>
+          {row.title_ar && (
+            <div style={{ color: "var(--or-brillant)", fontSize: "0.8rem" }}>
+              {row.title_ar}
+            </div>
+          )}
+        </div>
+      ),
+    },
     { key: "level", label: "Niveau" },
     {
       key: "forfait",
@@ -69,24 +127,21 @@ export default function AdminCoursPage() {
     {
       key: "lessons",
       label: "Leçons",
-      render: (_, row) => row.lessons?.length ?? 0,
+      render: (_, row) => (
+        <span style={{ color: "#aaa", fontSize: "0.875rem" }}>
+          {row.lessons?.length ?? 0} leçon(s)
+        </span>
+      ),
     },
     {
       key: "published",
       label: "Statut",
-      render: (v, row) => (
-        <button
-          type="button"
-          onClick={() => handleTogglePublish(row)}
-          className="flex items-center gap-1 rounded px-2 py-1 text-xs"
-          style={{
-            background: row.published ? "rgba(34,197,94,0.2)" : "rgba(156,163,175,0.2)",
-            color: row.published ? "#22c55e" : "#9ca3af",
-          }}
-        >
-          {row.published ? <Eye size={12} /> : <EyeOff size={12} />}
-          {row.published ? "Publié" : "Brouillon"}
-        </button>
+      render: (_, row) => (
+        <PublishButton
+          courseId={row.id}
+          published={row.published}
+          onToggle={() => handleTogglePublish(row)}
+        />
       ),
     },
     {
@@ -126,9 +181,9 @@ export default function AdminCoursPage() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="rounded-lg border bg-[#1a1a1a] px-3 py-2 text-sm"
-            style={{ borderColor: "#2a2a2a", color: "#fff" }}
+            style={{ borderColor: "#2a2a2a", color: "#fff", cursor: "pointer" }}
           >
-            <option value="">Tous les forfaits</option>
+            <option value="tous">Tous les forfaits</option>
             <option value="decouverte">Découverte</option>
             <option value="essentiel">Essentiel</option>
             <option value="intensif">Intensif</option>

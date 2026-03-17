@@ -43,6 +43,24 @@ export default async function EspaceMembreLayout({
 
     if (!forfait) redirect("/choisir-forfait");
 
+    const isFirstAccess =
+      profile &&
+      new Date(profile.created_at).getTime() > Date.now() - 60_000;
+    if (isFirstAccess && profile?.email && forfait) {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+      if (siteUrl) {
+        fetch(`${siteUrl}/api/emails/bienvenue`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: profile.email,
+            firstName: profile.first_name ?? "",
+            forfait,
+          }),
+        }).catch(() => {});
+      }
+    }
+
     return (
       <MemberProvider
         value={{

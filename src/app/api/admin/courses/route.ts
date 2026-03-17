@@ -14,7 +14,7 @@ export async function GET() {
       .order("created_at", { ascending: false });
 
     if (error) throw error;
-    return NextResponse.json(data ?? []);
+    return NextResponse.json({ courses: data ?? [] });
   } catch {
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   }
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) throw error;
-    return NextResponse.json(data);
+    return NextResponse.json({ course: data });
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Erreur" },

@@ -1,7 +1,9 @@
 import Stripe from "stripe";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdmin } from "@/lib/supabase/server";
-import { Resend } from "resend";
+import { sendEmail } from "@/lib/emails";
+import { ConfirmationEmail } from "@/lib/emails/templates/ConfirmationEmail";
+import { NotificationAdminEmail } from "@/lib/emails/templates/NotificationAdminEmail";
 
 export const dynamic = "force-dynamic";
 
@@ -10,11 +12,12 @@ function getStripe() {
   if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
   return new Stripe(key);
 }
-function getResend() {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) return null;
-  return new Resend(key);
-}
+
+const forfaitPrix: Record<string, number> = {
+  decouverte: 120,
+  essentiel: 299,
+  intensif: 490,
+};
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -64,25 +67,41 @@ export async function POST(req: NextRequest) {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("email, first_name")
+        .select("email, first_name, last_name")
         .eq("clerk_user_id", clerk_user_id)
         .single();
 
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://qalam.academy";
+      const contactEmail = process.env.CONTACT_EMAIL ?? "contact@qalam.academy";
+
       if (profile?.email) {
-        const resend = getResend();
-        if (resend) {
-          await resend.emails.send({
-          from: `Qalam <${process.env.CONTACT_EMAIL ?? "contact@qalam.academy"}>`,
+        await sendEmail({
           to: profile.email,
-          subject: "✒️ Votre accès Qalam est activé !",
-          html: `
-          <p>Bonjour ${profile.first_name ?? ""},</p>
-          <p>Votre forfait <strong>${forfait}</strong> est activé.</p>
-          <p><a href="${process.env.NEXT_PUBLIC_SITE_URL ?? "https://qalam.academy"}/espace-membre">Accéder à mes cours →</a></p>
-          <p>À bientôt sur Qalam ✒️</p>
-        `,
-          });
-        }
+          subject: `✒️ Confirmation — Forfait ${forfait} activé — Qalam`,
+          template: ConfirmationEmail({
+            firstName: profile.first_name ?? "Cher élève",
+            forfait,
+            type,
+            price: forfaitPrix[forfait] ?? 0,
+            siteUrl,
+          }),
+        });
+      }
+
+      if (profile && contactEmail) {
+        await sendEmail({
+          to: contactEmail,
+          subject: `💰 Nouveau paiement — ${profile.first_name ?? ""} — ${forfait}`,
+          template: NotificationAdminEmail({
+            senderName: [profile.first_name, profile.last_name].filter(Boolean).join(" ") || "Élève",
+            senderEmail: profile.email,
+            subject: `Paiement ${forfait} (${type})`,
+            message: "Nouveau paiement confirmé par Stripe.",
+            source: "stripe-payment",
+            receivedAt: new Date().toLocaleString("fr-FR"),
+            adminUrl: siteUrl,
+          }),
+        });
       }
     }
   }

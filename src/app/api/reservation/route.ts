@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdmin } from "@/lib/supabase/server";
+import { sendEmail } from "@/lib/emails";
+import { NotificationAdminEmail } from "@/lib/emails/templates/NotificationAdminEmail";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,15 +22,37 @@ export async function POST(req: NextRequest) {
       [key: string]: unknown;
     };
 
-    const displayName = name ?? firstName ?? "";
+    const displayName = (name ?? firstName ?? "Inconnu") as string;
+    const subjectVal = subject ?? "Formulaire de contact";
+    const messageVal = message ?? JSON.stringify(rest);
+    const sourceVal = subject ?? "contact";
+
     const supabase = createSupabaseAdmin();
     await supabase.from("messages").insert({
       name: displayName,
       email: email ?? "",
-      subject: subject ?? "Formulaire de contact",
-      message: message ?? JSON.stringify(rest),
-      source: subject ?? "contact",
+      subject: subjectVal,
+      message: messageVal,
+      source: sourceVal,
     });
+
+    const contactEmail = process.env.CONTACT_EMAIL;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+    if (contactEmail && email) {
+      sendEmail({
+        to: contactEmail,
+        subject: `📩 Nouveau message — ${subjectVal} — Qalam`,
+        template: NotificationAdminEmail({
+          senderName: displayName,
+          senderEmail: email as string,
+          subject: subjectVal,
+          message: messageVal,
+          source: sourceVal,
+          receivedAt: new Date().toLocaleString("fr-FR"),
+          adminUrl: siteUrl,
+        }),
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ ok: true });
   } catch {

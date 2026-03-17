@@ -28,14 +28,15 @@ export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside
-      className="flex w-64 flex-col border-r md:fixed md:inset-y-0 md:left-0 md:z-30"
+    <div
       style={{
-        background: "#111111",
-        borderColor: "#2a2a2a",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        padding: "24px 16px",
       }}
     >
-      <div className="border-b p-6" style={{ borderColor: "#2a2a2a" }}>
+      <div className="border-b pb-4" style={{ borderColor: "#2a2a2a" }}>
         <Link href="/admin" className="block">
           <QalamLogo height={36} invert />
         </Link>
@@ -49,7 +50,7 @@ export function AdminSidebar() {
           ADMIN
         </span>
       </div>
-      <nav className="flex flex-1 flex-col gap-1 p-4">
+      <nav className="flex flex-1 flex-col gap-1 pt-4">
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
@@ -70,7 +71,7 @@ export function AdminSidebar() {
           );
         })}
       </nav>
-      <div className="border-t p-4" style={{ borderColor: "#2a2a2a" }}>
+      <div className="mt-auto border-t pt-4" style={{ borderColor: "#2a2a2a" }}>
         <a
           href="/"
           target="_blank"
@@ -90,6 +91,6 @@ export function AdminSidebar() {
           </button>
         </SignOutButton>
       </div>
-    </aside>
+    </div>
   );
 }
