@@ -17,55 +17,65 @@ export default async function AdminLayout({
   if (!admin) redirect("/");
 
   return (
-    <div
-      className="admin-layout"
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        background: "#0f0f0f",
-        position: "relative",
-        zIndex: 100,
-        cursor: "auto",
-      }}
-    >
-      <aside
-        className="hidden md:block"
-        style={{
-          width: "220px",
-          minWidth: "220px",
-          flexShrink: 0,
-          position: "fixed",
-          top: 0,
-          left: 0,
-          height: "100vh",
-          zIndex: 200,
-          overflowY: "auto",
-          background: "#111111",
-          borderRight: "1px solid #2a2a2a",
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `document.body.style.background='#0f0f0f';document.body.style.color='#fff';`,
         }}
-      >
-        <AdminSidebar />
-      </aside>
-
-      <main
-        className="md:ml-[220px]"
+      />
+      <div
+        className="admin-layout"
+        data-admin="true"
         style={{
-          flex: 1,
+          display: "flex",
           minHeight: "100vh",
-          padding: "32px",
-          overflowX: "hidden",
           background: "#0f0f0f",
+          position: "fixed",
+          inset: 0,
+          zIndex: 9000,
+          overflowY: "auto",
+          cursor: "auto",
         }}
       >
-        <a
-          href="/admin"
-          className="md:hidden mb-4 inline-block text-sm"
-          style={{ color: "var(--or-brillant)" }}
+        <aside
+          className="hidden md:block"
+          style={{
+            width: "220px",
+            minWidth: "220px",
+            flexShrink: 0,
+            position: "fixed",
+            top: 0,
+            left: 0,
+            height: "100vh",
+            zIndex: 9100,
+            overflowY: "auto",
+            background: "#111111",
+            borderRight: "1px solid #2a2a2a",
+          }}
         >
-          ← Menu admin
-        </a>
-        {children}
-      </main>
-    </div>
+          <AdminSidebar />
+        </aside>
+
+        <main
+          className="md:ml-[220px]"
+          style={{
+            flex: 1,
+            minHeight: "100vh",
+            padding: "32px",
+            overflowX: "hidden",
+            background: "#0f0f0f",
+          }}
+        >
+          <a
+            href="/admin"
+            className="md:hidden mb-4 inline-block text-sm"
+            style={{ color: "var(--or-brillant)" }}
+          >
+            ← Menu admin
+          </a>
+          {children}
+        </main>
+      </div>
+    </>
   );
 }

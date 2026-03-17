@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import NavBar from "@/components/ui/NavBar";
 import Footer from "@/components/ui/Footer";
+import PageTransition from "@/components/PageTransition";
 
 export function ConditionalLayout({
   children,
@@ -19,7 +20,7 @@ export function ConditionalLayout({
   return (
     <>
       <NavBar />
-      {children}
+      <PageTransition>{children}</PageTransition>
       <Footer />
     </>
   );

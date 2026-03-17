@@ -7,7 +7,6 @@ import { defaultMetadata } from "@/lib/seo";
 import { organizationJsonLd } from "@/lib/seo";
 import "@/styles/globals.css";
 import CustomCursor from "@/components/shared/CustomCursor";
-import PageTransition from "@/components/PageTransition";
 import { ConditionalLayout } from "@/components/ConditionalLayout";
 
 const amiri = Amiri({
@@ -55,9 +54,7 @@ export default function RootLayout({
       <html lang="fr">
         <body className={`${amiri.variable} ${cormorant.variable} ${lato.variable} ${nunito.variable} antialiased`}>
           <CustomCursor />
-          <ConditionalLayout>
-            <PageTransition>{children}</PageTransition>
-          </ConditionalLayout>
+          <ConditionalLayout>{children}</ConditionalLayout>
           <Script
             id="organization-schema"
             type="application/ld+json"

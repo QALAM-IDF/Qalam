@@ -69,6 +69,20 @@ body {
   }
 }
 
+/* Fond immédiat pour les pages admin — éviter le flash beige */
+html:has([data-admin]) body {
+  background: #0f0f0f !important;
+}
+
+body.admin-page {
+  background: #0f0f0f !important;
+  color: #ffffff !important;
+}
+
+body:has(.admin-layout) {
+  background: #0f0f0f !important;
+}
+
 /* Forcer le curseur système normal sur les pages admin */
 .admin-layout,
 .admin-layout * {
