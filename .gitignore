@@ -31,8 +31,10 @@ yarn-error.log*
 .pnpm-debug.log*
 .orchids/*.log
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files (never commit secrets)
+.env
+.env.local
+.env*.local
 
 # vercel
 .vercel

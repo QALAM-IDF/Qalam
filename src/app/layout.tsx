@@ -1,6 +1,8 @@
 import { Amiri, Cormorant_Garamond, Lato, Nunito } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 import { defaultMetadata } from "@/lib/seo";
 import { organizationJsonLd } from "@/lib/seo";
 import "@/styles/globals.css";
@@ -63,6 +65,8 @@ export default function RootLayout({
             }}
             strategy="afterInteractive"
           />
+          <SpeedInsights />
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
