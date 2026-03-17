@@ -70,12 +70,14 @@ export default function CpfPage() {
     <main className="overflow-hidden">
       {/* Section 1 — Hero CPF */}
       <section
-        className="grain-overlay grain-surface relative flex min-h-[85vh] flex-col items-center justify-center px-6 py-24 text-center"
+        className="grain-overlay grain-surface relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-6 py-24 text-center"
         style={{ background: "var(--beige-creme)" }}
       >
         <ArabicPattern
-          className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.06]"
+          className="pointer-events-none"
+          opacity={0.06}
           color="var(--encre-noire)"
+          size={500}
         />
         <motion.div
           className="relative z-10"

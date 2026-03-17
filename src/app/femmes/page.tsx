@@ -19,9 +19,10 @@ export default function FemmesPage() {
     <main className="overflow-hidden bg-[#f7efe3] pt-20 text-[#3f2a1f]">
       <section className="grain-surface grain-overlay relative min-h-[85vh] overflow-hidden bg-gradient-to-b from-[#e8c4a0] via-[#a67c52] to-[#2d4a2d] py-16 text-[#fdf3e8]">
         <ArabicPattern
-          className="pointer-events-none absolute inset-0 h-full w-full"
-          color="#f5e3cf"
+          className="pointer-events-none"
+          color="var(--andalou-ivoire)"
           opacity={0.12}
+          size={500}
           animate
         />
         <FloatingPetals />

@@ -20,13 +20,13 @@ export default function Hero() {
   return (
     <section className="grain-surface grain-overlay relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-[#e8d5b0] via-[#c9a96e] to-[#f5efe0] pb-20 pt-20 text-center md:pb-0">
       <motion.div
-        className="pointer-events-none absolute inset-0 mx-auto h-full w-full"
+        className="pointer-events-none absolute inset-0 overflow-hidden"
         style={{ y: shouldParallax ? patternY : 0 }}
       >
         <ArabicPattern
-          className="h-full w-full scale-[1.4]"
           opacity={0.08}
           color="var(--encre-douce)"
+          size={600}
         />
       </motion.div>
 

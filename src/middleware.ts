@@ -5,6 +5,7 @@ const isProtectedRoute = createRouteMatcher([
   "/choisir-forfait(.*)",
   "/api/progression(.*)",
   "/api/reservation(.*)",
+  // NE PAS ajouter /auth-redirect : après login Clerk redirige ici, puis la page redirige selon forfait
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

@@ -6,8 +6,10 @@ import { forfaits } from "@/data/forfaits";
 import { QalamLogo } from "@/components/shared/QalamLogo";
 import { Check, Loader2 } from "lucide-react";
 
+type PaymentType = "unique" | "mensuel" | "cpf";
+
 export default function ChoisirForfaitClient() {
-  const [type, setType] = useState<"unique" | "mensuel">("unique");
+  const [type, setType] = useState<PaymentType>("unique");
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
 
@@ -40,6 +42,12 @@ export default function ChoisirForfaitClient() {
     type === "unique" ? true : f.id !== "decouverte"
   );
 
+  const tabLabels: Record<PaymentType, string> = {
+    unique: "Paiement unique",
+    mensuel: "Abonnement mensuel",
+    cpf: "Financement CPF 🎓",
+  };
+
   return (
     <main
       className="min-h-screen grain-overlay"
@@ -64,17 +72,17 @@ export default function ChoisirForfaitClient() {
         </p>
       </div>
 
-      <div className="flex justify-center mb-10 px-4">
+      <div className="flex justify-center mb-10 px-4 flex-wrap gap-2">
         <div
           className="flex rounded-full p-1 gap-1"
           style={{ background: "var(--beige-chaud)" }}
         >
-          {(["unique", "mensuel"] as const).map((t) => (
+          {(["unique", "mensuel", "cpf"] as const).map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => setType(t)}
-              className="px-6 py-2 rounded-full font-body text-sm transition-all"
+              className="px-4 py-2 rounded-full font-body text-sm transition-all sm:px-6"
               style={{
                 background: type === t ? "var(--or-brillant)" : "transparent",
                 color:
@@ -82,9 +90,7 @@ export default function ChoisirForfaitClient() {
                 fontWeight: type === t ? 700 : 400,
               }}
             >
-              {t === "unique"
-                ? "Paiement unique"
-                : "Abonnement mensuel"}
+              {tabLabels[t]}
             </button>
           ))}
         </div>
@@ -99,6 +105,152 @@ export default function ChoisirForfaitClient() {
         </p>
       )}
 
+      {type === "cpf" && (
+        <div className="max-w-2xl mx-auto px-4 pb-20">
+          <div
+            className="rounded-2xl p-8 text-center grain-overlay"
+            style={{
+              background: "var(--blanc-ivoire)",
+              border: "2px solid var(--or-brillant)",
+            }}
+          >
+            <div
+              className="inline-block px-4 py-1 rounded-full text-sm font-bold mb-6"
+              style={{
+                background: "var(--or-brillant)",
+                color: "var(--encre-noire)",
+              }}
+            >
+              ✅ Éligible CPF
+            </div>
+
+            <p
+              className="font-arabic text-3xl mb-2"
+              style={{ color: "var(--or-luxe)" }}
+            >
+              التكوين المهني
+            </p>
+            <h2
+              className="font-display text-3xl mb-4"
+              style={{ color: "var(--encre-noire)" }}
+            >
+              Financer votre formation avec le CPF
+            </h2>
+            <p
+              className="font-body mb-6"
+              style={{ color: "var(--encre-douce)" }}
+            >
+              Utilisez vos droits Compte Personnel de Formation pour accéder à
+              nos formations d&apos;arabe certifiées. Prise en charge totale
+              possible selon votre solde CPF.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+              <div
+                className="rounded-xl p-5 text-left"
+                style={{
+                  background: "var(--beige-chaud)",
+                  border: "1px solid var(--or-brillant)",
+                }}
+              >
+                <p
+                  className="font-arabic text-2xl mb-1"
+                  style={{ color: "var(--or-luxe)" }}
+                >
+                  اللغة العربية
+                </p>
+                <h3
+                  className="font-display text-xl mb-2"
+                  style={{ color: "var(--encre-noire)" }}
+                >
+                  Arabe
+                </h3>
+                <p
+                  className="font-body text-sm mb-4"
+                  style={{ color: "var(--encre-douce)" }}
+                >
+                  Débutant → Avancé → Coranique. Modules certifiés, professeurs
+                  natifs.
+                </p>
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full py-3 rounded-full text-center font-display transition-all"
+                  style={{
+                    background: "var(--or-brillant)",
+                    color: "var(--encre-noire)",
+                    fontWeight: 600,
+                  }}
+                >
+                  S&apos;inscrire avec mon CPF →
+                </a>
+              </div>
+
+              <div
+                className="rounded-xl p-5 text-left"
+                style={{
+                  background: "var(--magie-marine)",
+                  border: "1px solid var(--magie-turquoise)",
+                }}
+              >
+                <p
+                  className="font-arabic text-2xl mb-1"
+                  style={{ color: "var(--magie-turquoise)" }}
+                >
+                  اللغة الإنجليزية
+                </p>
+                <h3
+                  className="font-display text-xl mb-2"
+                  style={{ color: "var(--magie-etoile)" }}
+                >
+                  Anglais
+                </h3>
+                <p
+                  className="font-body text-sm mb-4"
+                  style={{ color: "var(--magie-etoile)", opacity: 0.8 }}
+                >
+                  Débutant → Business. Modules adaptés à vos objectifs
+                  professionnels.
+                </p>
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full py-3 rounded-full text-center font-display transition-all"
+                  style={{
+                    background: "var(--magie-turquoise)",
+                    color: "var(--magie-indigo)",
+                    fontWeight: 600,
+                  }}
+                >
+                  S&apos;inscrire avec mon CPF →
+                </a>
+              </div>
+            </div>
+
+            <p
+              className="font-body text-sm"
+              style={{ color: "var(--encre-douce)" }}
+            >
+              Consultez votre solde CPF sur{" "}
+              <a
+                href="https://www.moncompteformation.gouv.fr"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: "var(--or-luxe)",
+                  textDecoration: "underline",
+                }}
+              >
+                moncompteformation.gouv.fr
+              </a>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {type !== "cpf" && (
       <div className="max-w-5xl mx-auto px-4 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {list.map((forfait, i) => (
@@ -233,6 +385,7 @@ export default function ChoisirForfaitClient() {
           Paiement 100% sécurisé via Stripe. Accès immédiat après confirmation.
         </p>
       </div>
+      )}
     </main>
   );
 }

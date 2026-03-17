@@ -66,8 +66,10 @@ export default function TarifsPage() {
     <main className="overflow-hidden bg-[var(--beige-creme)] pt-20">
       <section className="grain-surface relative overflow-hidden bg-[var(--beige-creme)] pb-16 pt-12">
         <ArabicPattern
-          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          className="pointer-events-none"
+          opacity={0.06}
           color="var(--encre-douce)"
+          size={400}
         />
         <div className="section-shell relative text-center">
           <motion.p

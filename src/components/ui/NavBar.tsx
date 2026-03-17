@@ -18,7 +18,7 @@ const links = [
   { href: "/cpf", label: "CPF", labelAr: "التكوين", badge: true },
   { href: "/blog", label: "Blog" },
   { href: "/a-propos", label: "À propos" },
-  { href: "#contact", label: "Contact" },
+  { href: "/contact", label: "Contact" },
 ];
 
 const accents: Record<string, string> = {
@@ -30,6 +30,7 @@ const accents: Record<string, string> = {
   "/cpf": "var(--or-luxe)",
   "/blog": "var(--or-luxe)",
   "/a-propos": "var(--or-luxe)",
+  "/contact": "var(--or-luxe)",
 };
 
 export default function NavBar() {
@@ -79,7 +80,7 @@ export default function NavBar() {
 
         <div className="hidden items-center gap-6 md:flex">
           {links.map((link) => {
-            const active = link.href !== "#contact" && pathname === link.href;
+            const active = pathname === link.href;
             const withBadge = "badge" in link && link.badge;
             return (
               <Link
@@ -198,7 +199,7 @@ export default function NavBar() {
                     href={link.href}
                     className="font-display text-3xl font-medium"
                     style={{
-                      color: pathname === link.href && link.href !== "#contact" ? accent : "#faf6ee",
+                      color: pathname === link.href ? accent : "#faf6ee",
                     }}
                     onClick={() => setOpen(false)}
                   >

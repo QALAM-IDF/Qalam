@@ -50,8 +50,10 @@ export default function MissionBlock() {
 
       <div className="relative flex flex-col gap-6">
         <ArabicPattern
-          className="pointer-events-none absolute -inset-4 opacity-20"
+          className="pointer-events-none"
+          opacity={0.2}
           color="var(--or-luxe)"
+          size={320}
           animate
         />
         <div
