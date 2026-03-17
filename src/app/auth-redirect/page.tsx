@@ -2,35 +2,29 @@ export const dynamic = "force-dynamic";
 
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getOrCreateProfile, getUserForfait } from "@/lib/user";
+import {
+  getOrCreateProfile,
+  getUserForfait,
+  getUserRole,
+} from "@/lib/user";
+import { isAdmin } from "@/lib/admin";
 
 export default async function AuthRedirectPage() {
+  const { userId } = await auth();
+  if (!userId) redirect("/connexion");
+
+  const admin = await isAdmin();
+  if (admin) redirect("/admin");
+
   try {
-    const { userId } = await auth();
+    await getOrCreateProfile();
+  } catch {}
 
-    if (!userId) {
-      redirect("/connexion");
-    }
+  const role = await getUserRole(userId);
+  if (role === "professeur") redirect("/professeur");
 
-    try {
-      await getOrCreateProfile();
-    } catch (e) {
-      console.error("getOrCreateProfile error:", e);
-    }
+  const forfait = await getUserForfait(userId).catch(() => null);
+  if (forfait) redirect("/espace-membre");
 
-    let forfait = null;
-    try {
-      forfait = await getUserForfait(userId);
-    } catch (e) {
-      console.error("getUserForfait error:", e);
-    }
-
-    if (forfait) {
-      redirect("/espace-membre");
-    } else {
-      redirect("/choisir-forfait");
-    }
-  } catch {
-    redirect("/choisir-forfait");
-  }
+  redirect("/choisir-forfait");
 }

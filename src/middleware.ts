@@ -3,11 +3,11 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 const isProtectedRoute = createRouteMatcher([
   "/espace-membre(.*)",
   "/admin(.*)",
+  "/professeur(.*)",
   "/api/progression(.*)",
   "/api/admin(.*)",
+  "/api/professeur(.*)",
   "/api/courses(.*)",
-  // NE PAS inclure /auth-redirect (Clerk y redirige après login)
-  // NE PAS inclure /choisir-forfait (auth-redirect y envoie si pas de forfait)
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

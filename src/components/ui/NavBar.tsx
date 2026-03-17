@@ -128,7 +128,7 @@ export default function NavBar() {
           </Show>
           <Show when="signed-in">
             <Link
-              href="/espace-membre"
+              href="/auth-redirect"
               className="rounded-full border px-5 py-2 font-display text-sm font-medium transition-all hover:opacity-90"
               style={{
                 borderColor: "var(--or-brillant)",
@@ -246,7 +246,7 @@ export default function NavBar() {
                   transition={{ delay: 0.3, duration: 0.25 }}
                 >
                   <Link
-                    href="/espace-membre"
+                    href="/auth-redirect"
                     className="inline-flex rounded-full border-2 px-6 py-3 font-display text-lg font-medium"
                     style={{ borderColor: "#faf6ee", color: "#faf6ee" }}
                     onClick={() => setOpen(false)}

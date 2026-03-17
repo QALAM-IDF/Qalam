@@ -98,6 +98,16 @@ body:has(.admin-layout) {
   cursor: pointer !important;
 }
 
+/* Fond professeur */
+body:has(.prof-layout) {
+  background: #0a0f0a !important;
+}
+
+.prof-layout,
+.prof-layout * {
+  cursor: auto !important;
+}
+
 a {
   color: inherit;
   text-decoration: none;

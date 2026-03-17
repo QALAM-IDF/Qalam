@@ -48,7 +48,7 @@ export default function CustomCursor() {
     return () => cancelAnimationFrame(raf);
   }, [show, pos.x, pos.y]);
 
-  if (pathname?.startsWith("/admin")) return null;
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/professeur")) return null;
   if (!show) return null;
 
   return (
