@@ -1,6 +1,8 @@
 "use client";
 
-import { mockCourses, forfaitAccess } from "@/data/mock-courses";
+import { useEffect, useState } from "react";
+import { forfaitAccess } from "@/lib/courses";
+import type { Course } from "@/data/mock-courses";
 import { useMember } from "@/context/MemberContext";
 import MemberCourseCard from "@/components/membre/MemberCourseCard";
 
@@ -14,8 +16,24 @@ function useProgressionByCourse(progression: { course_id: string; completed: boo
 
 export default function CoursPage() {
   const { forfait, progression } = useMember();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
   const byCourse = useProgressionByCourse(progression);
   const accessibleIds = forfait ? (forfaitAccess[forfait] ?? []) : [];
+
+  useEffect(() => {
+    if (!forfait) {
+      setCourses([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    fetch(`/api/courses?forfait=${encodeURIComponent(forfait)}`)
+      .then((r) => r.json())
+      .then((data) => setCourses(Array.isArray(data) ? data : []))
+      .catch(() => setCourses([]))
+      .finally(() => setLoading(false));
+  }, [forfait]);
 
   return (
     <div className="section-shell py-12 md:py-16">
@@ -27,20 +45,24 @@ export default function CoursPage() {
           Mes cours
         </h1>
       </header>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {mockCourses.map((course) => {
-          const accessible = accessibleIds.includes(course.id);
-          const completed = byCourse[course.id] ?? 0;
-          return (
-            <MemberCourseCard
-              key={course.id}
-              course={course}
-              progression={{ completed, total: course.totalLessons }}
-              locked={!accessible}
-            />
-          );
-        })}
-      </div>
+      {loading ? (
+        <p style={{ color: "var(--encre-douce)" }}>Chargement des cours…</p>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {courses.map((course) => {
+            const accessible = accessibleIds.includes(course.id);
+            const completed = byCourse[course.id] ?? 0;
+            return (
+              <MemberCourseCard
+                key={course.id}
+                course={course}
+                progression={{ completed, total: course.totalLessons }}
+                locked={!accessible}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

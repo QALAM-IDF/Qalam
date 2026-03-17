@@ -1,10 +1,10 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { mockCourses, forfaitAccess } from "@/data/mock-courses";
-import type { Lesson } from "@/data/mock-courses";
+import { forfaitAccess } from "@/lib/courses";
+import type { Course, Lesson } from "@/data/mock-courses";
 import { useMember } from "@/context/MemberContext";
 import VideoPlayer from "@/components/membre/VideoPlayer";
 import LessonList from "@/components/membre/LessonList";
@@ -15,17 +15,26 @@ export default function LessonPage() {
   const router = useRouter();
   const { courseId, lessonId } = params;
   const { forfait, progression } = useMember();
+  const [courseData, setCourseData] = useState<Course | null>(null);
+
+  useEffect(() => {
+    if (!courseId) return;
+    fetch(`/api/courses/${courseId}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then(setCourseData)
+      .catch(() => setCourseData(null));
+  }, [courseId]);
 
   const { course, lesson, nextLesson, lessonIndex, lessonsWithProgress } =
     useMemo(() => {
-      const c = mockCourses.find((x) => x.id === courseId);
+      const c = courseData;
       if (!c)
         return {
           course: null,
           lesson: null,
           nextLesson: null,
           lessonIndex: 0,
-          lessonsWithProgress: [],
+          lessonsWithProgress: [] as (Lesson & { completed?: boolean })[],
         };
       const completedSet = new Set(
         progression
@@ -52,7 +61,7 @@ export default function LessonPage() {
         lessonIndex: idx + 1,
         lessonsWithProgress,
       };
-    }, [courseId, lessonId, progression]);
+    }, [courseId, lessonId, progression, courseData]);
 
   const saveProgress = useCallback(
     async (quizScore?: number) => {
@@ -68,6 +77,14 @@ export default function LessonPage() {
     },
     [courseId, lessonId]
   );
+
+  if (courseData === null && !course) {
+    return (
+      <div className="section-shell py-12">
+        <p style={{ color: "var(--encre-douce)" }}>Chargement…</p>
+      </div>
+    );
+  }
 
   if (!course || !lesson) {
     return (

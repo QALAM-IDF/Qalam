@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { mockCourses, forfaitAccess } from "@/data/mock-courses";
+import { forfaitAccess } from "@/lib/courses";
+import type { Course } from "@/data/mock-courses";
 import { useMember } from "@/context/MemberContext";
 import ProgressBar from "@/components/membre/ProgressBar";
 
@@ -21,13 +23,29 @@ const activities = [
 
 export default function ProgressionPage() {
   const { forfait, progression } = useMember();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
   const byCourse = useProgressionByCourse(progression);
   const accessibleIds = forfait ? (forfaitAccess[forfait] ?? []) : [];
+
+  useEffect(() => {
+    if (!forfait) {
+      setCourses([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    fetch(`/api/courses?forfait=${encodeURIComponent(forfait)}`)
+      .then((r) => r.json())
+      .then((data) => setCourses(Array.isArray(data) ? data : []))
+      .catch(() => setCourses([]))
+      .finally(() => setLoading(false));
+  }, [forfait]);
 
   const totalCompleted = Object.values(byCourse).reduce((s, n) => s + n, 0);
   let totalLessons = 0;
   for (const id of accessibleIds) {
-    const course = mockCourses.find((c) => c.id === id);
+    const course = courses.find((c) => c.id === id);
     if (course) totalLessons += course.totalLessons;
   }
   const percent = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
@@ -82,12 +100,15 @@ export default function ProgressionPage() {
           Par cours
         </h2>
         <div className="mt-6 space-y-6">
-          {accessibleIds.map((id) => {
-            const course = mockCourses.find((c) => c.id === id);
-            if (!course) return null;
-            const completed = byCourse[id] ?? 0;
-            const total = course.totalLessons;
-            return (
+          {loading ? (
+            <p style={{ color: "var(--encre-douce)" }}>Chargement…</p>
+          ) : (
+            accessibleIds.map((id) => {
+              const course = courses.find((c) => c.id === id);
+              if (!course) return null;
+              const completed = byCourse[id] ?? 0;
+              const total = course.totalLessons;
+              return (
               <div
                 key={id}
                 className="rounded-xl border p-6"
@@ -132,7 +153,8 @@ export default function ProgressionPage() {
                 </div>
               </div>
             );
-          })}
+          })
+          )}
         </div>
       </section>
 

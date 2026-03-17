@@ -1,13 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createSupabaseAdmin } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { subject, ...formData } = body as { subject?: string; [key: string]: unknown };
+    const {
+      subject,
+      name,
+      firstName,
+      email,
+      message,
+      ...rest
+    } = body as {
+      subject?: string;
+      name?: string;
+      firstName?: string;
+      email?: string;
+      message?: string;
+      [key: string]: unknown;
+    };
 
-    // Optionnel : envoyer par email via Resend plus tard
-    // const resend = new Resend(process.env.RESEND_API_KEY);
-    // await resend.emails.send({ ... });
+    const displayName = name ?? firstName ?? "";
+    const supabase = createSupabaseAdmin();
+    await supabase.from("messages").insert({
+      name: displayName,
+      email: email ?? "",
+      subject: subject ?? "Formulaire de contact",
+      message: message ?? JSON.stringify(rest),
+      source: subject ?? "contact",
+    });
 
     return NextResponse.json({ ok: true });
   } catch {

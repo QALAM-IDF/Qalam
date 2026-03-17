@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { mockCourses, forfaitAccess } from "@/data/mock-courses";
+import { forfaitAccess } from "@/lib/courses";
+import type { Course } from "@/data/mock-courses";
 import { useMember } from "@/context/MemberContext";
 import MemberCourseCard from "@/components/membre/MemberCourseCard";
 import ProgressBar from "@/components/membre/ProgressBar";
@@ -29,13 +31,30 @@ function useProgressionByCourse(progression: { course_id: string; lesson_id: str
 
 export default function EspaceMembrePage() {
   const { profile, forfait, progression: rawProgression } = useMember();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
   const progression = rawProgression ?? [];
   const byCourse = useProgressionByCourse(progression);
   const accessibleIds = forfait ? (forfaitAccess[forfait] ?? []) : [];
 
+  useEffect(() => {
+    if (!forfait) {
+      setCourses([]);
+      setCoursesLoading(false);
+      return;
+    }
+    setCoursesLoading(true);
+    fetch(`/api/courses?forfait=${encodeURIComponent(forfait)}`)
+      .then((r) => r.json())
+      .then((data) => setCourses(Array.isArray(data) ? data : []))
+      .catch(() => setCourses([]))
+      .finally(() => setCoursesLoading(false));
+  }, [forfait]);
+
   const lastIncomplete = (() => {
+    if (coursesLoading || !courses.length) return null;
     for (const courseId of accessibleIds) {
-      const course = mockCourses.find((c) => c.id === courseId);
+      const course = courses.find((c) => c.id === courseId);
       if (!course) continue;
       const set = byCourse[courseId]?.lessonIds;
       const firstIncomplete = course.lessons.find(
@@ -148,33 +167,37 @@ export default function EspaceMembrePage() {
           Mes cours
         </h2>
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {mockCourses.map((course) => {
-            const accessible = accessibleIds.includes(course.id);
-            const prog = byCourse[course.id] ?? {
-              completed: 0,
-              total: course.totalLessons,
-              lessonIds: new Set<string>(),
-            };
-            const total = course.totalLessons;
-            const courseWithProgress = {
-              ...course,
-              lessons: course.lessons.map((l) => ({
-                ...l,
-                completed: prog.lessonIds?.has(l.id) ?? false,
-              })),
-            };
-            return (
-              <MemberCourseCard
-                key={course.id}
-                course={courseWithProgress}
-                progression={{
-                  completed: prog.completed,
-                  total,
-                }}
-                locked={!accessible}
-              />
-            );
-          })}
+          {coursesLoading ? (
+            <p style={{ color: "var(--encre-douce)" }}>Chargement des cours…</p>
+          ) : (
+            courses.map((course) => {
+              const accessible = accessibleIds.includes(course.id);
+              const prog = byCourse[course.id] ?? {
+                completed: 0,
+                total: course.totalLessons,
+                lessonIds: new Set<string>(),
+              };
+              const total = course.totalLessons;
+              const courseWithProgress = {
+                ...course,
+                lessons: course.lessons.map((l) => ({
+                  ...l,
+                  completed: prog.lessonIds?.has(l.id) ?? false,
+                })),
+              };
+              return (
+                <MemberCourseCard
+                  key={course.id}
+                  course={courseWithProgress}
+                  progression={{
+                    completed: prog.completed,
+                    total,
+                  }}
+                  locked={!accessible}
+                />
+              );
+            })
+          )}
         </div>
       </section>
 
@@ -187,7 +210,7 @@ export default function EspaceMembrePage() {
         </h2>
         <div className="mt-6 space-y-4">
           {accessibleIds.map((id) => {
-            const course = mockCourses.find((c) => c.id === id);
+            const course = courses.find((c) => c.id === id);
             if (!course) return null;
             const prog = byCourse[id] ?? { completed: 0, lessonIds: new Set<string>() };
             const total = course.totalLessons;

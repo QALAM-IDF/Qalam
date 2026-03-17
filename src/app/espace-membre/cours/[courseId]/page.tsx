@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
-import { mockCourses, forfaitAccess } from "@/data/mock-courses";
+import { getCourseById, forfaitAccess } from "@/lib/courses";
 import { getUserForfait, getUserProgression } from "@/lib/user";
 import LessonList from "@/components/membre/LessonList";
 import ProgressBar from "@/components/membre/ProgressBar";
@@ -15,12 +15,12 @@ export default async function CourseDetailPage({ params }: Props) {
   const { userId } = await auth();
   if (!userId) redirect("/connexion");
 
-  const [forfait, progression] = await Promise.all([
+  const [course, forfait, progression] = await Promise.all([
+    getCourseById(courseId),
     getUserForfait(userId),
     getUserProgression(userId),
   ]);
 
-  const course = mockCourses.find((c) => c.id === courseId);
   if (!course) notFound();
 
   const accessibleIds = forfait ? (forfaitAccess[forfait] ?? []) : [];
