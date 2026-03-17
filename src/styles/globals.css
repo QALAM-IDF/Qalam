@@ -69,6 +69,21 @@ body {
   }
 }
 
+/* Forcer le curseur système normal sur les pages admin */
+.admin-layout,
+.admin-layout * {
+  cursor: auto !important;
+}
+
+.admin-layout a,
+.admin-layout button,
+.admin-layout select,
+.admin-layout input,
+.admin-layout textarea,
+.admin-layout [role="button"] {
+  cursor: pointer !important;
+}
+
 a {
   color: inherit;
   text-decoration: none;

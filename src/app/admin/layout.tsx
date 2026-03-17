@@ -18,12 +18,14 @@ export default async function AdminLayout({
 
   return (
     <div
+      className="admin-layout"
       style={{
         display: "flex",
         minHeight: "100vh",
         background: "#0f0f0f",
         position: "relative",
         zIndex: 100,
+        cursor: "auto",
       }}
     >
       <aside
