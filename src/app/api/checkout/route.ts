@@ -45,5 +45,10 @@ export async function POST(req: NextRequest) {
   };
   const session = await getStripe().checkout.sessions.create(params);
 
+  if (!session.url)
+    return NextResponse.json(
+      { error: "Session URL manquante" },
+      { status: 500 }
+    );
   return NextResponse.json({ url: session.url });
 }
