@@ -28,7 +28,8 @@ function useProgressionByCourse(progression: { course_id: string; lesson_id: str
 }
 
 export default function EspaceMembrePage() {
-  const { profile, forfait, progression } = useMember();
+  const { profile, forfait, progression: rawProgression } = useMember();
+  const progression = rawProgression ?? [];
   const byCourse = useProgressionByCourse(progression);
   const accessibleIds = forfait ? (forfaitAccess[forfait] ?? []) : [];
 
@@ -49,7 +50,7 @@ export default function EspaceMembrePage() {
 
   const totalCompleted = Object.values(byCourse).reduce((s, p) => s + p.completed, 0);
   const hoursWatched = Math.round(
-    progression.reduce((s, p) => s + (p.watch_time_seconds ?? 0), 0) / 3600
+    (progression ?? []).reduce((s, p) => s + (p.watch_time_seconds ?? 0), 0) / 3600
   );
   const joinedAt = profile?.created_at ? new Date(profile.created_at) : new Date();
   const daysSinceJoin = Math.max(

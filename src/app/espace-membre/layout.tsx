@@ -13,32 +13,53 @@ export default async function EspaceMembreLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { userId } = await auth();
-  if (!userId) redirect("/connexion");
+  try {
+    const { userId } = await auth();
+    if (!userId) redirect("/connexion");
 
-  const [profile, forfait, progression] = await Promise.all([
-    getOrCreateProfile(),
-    getUserForfait(userId),
-    getUserProgression(userId),
-  ]);
+    let profile = null;
+    let forfait = null;
+    let progression: Awaited<ReturnType<typeof getUserProgression>> = [];
 
-  if (!forfait) redirect("/choisir-forfait");
+    try {
+      profile = await getOrCreateProfile();
+    } catch (e) {
+      console.error("getOrCreateProfile error:", e);
+    }
 
-  return (
-    <MemberProvider
-      value={{
-        profile,
-        forfait,
-        progression,
-      }}
-    >
-      <div
-        className="min-h-screen"
-        style={{ backgroundColor: "var(--beige-creme)" }}
+    try {
+      forfait = await getUserForfait(userId);
+    } catch (e) {
+      console.error("getUserForfait error:", e);
+    }
+
+    try {
+      progression = await getUserProgression(userId);
+    } catch (e) {
+      console.error("getUserProgression error:", e);
+    }
+
+    if (!forfait) redirect("/choisir-forfait");
+
+    return (
+      <MemberProvider
+        value={{
+          profile,
+          forfait,
+          progression: progression ?? [],
+        }}
       >
-        <MemberSidebar />
-        <main className="md:pl-[260px] pb-20 md:pb-0">{children}</main>
-      </div>
-    </MemberProvider>
-  );
+        <div
+          className="min-h-screen"
+          style={{ backgroundColor: "var(--beige-creme)" }}
+        >
+          <MemberSidebar />
+          <main className="md:pl-[260px] pb-20 md:pb-0">{children}</main>
+        </div>
+      </MemberProvider>
+    );
+  } catch (error) {
+    console.error("EspaceMembreLayout error:", error);
+    redirect("/connexion");
+  }
 }
