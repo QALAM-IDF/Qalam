@@ -13,6 +13,7 @@ type Eleve = {
   forfait_status: string | null;
   purchased_at: string | null;
   expires_at: string | null;
+  role?: string | null;
 };
 
 const forfaitColors: Record<string, { bg: string; color: string }> = {
@@ -20,6 +21,76 @@ const forfaitColors: Record<string, { bg: string; color: string }> = {
   essentiel: { bg: "#0a1a00", color: "#4ade80" },
   intensif: { bg: "#1a0a00", color: "#fb923c" },
 };
+
+const roleConfig: Record<
+  string,
+  { bg: string; color: string; label: string }
+> = {
+  professeur: { bg: "#052020", color: "#2dd4bf", label: "Prof ✦" },
+  admin: { bg: "#2a1f00", color: "#d4af37", label: "Admin" },
+  eleve: { bg: "#1a1a1a", color: "#666", label: "Élève" },
+};
+
+function RoleButton({
+  eleveId,
+  currentRole,
+  onUpdate,
+}: {
+  eleveId: string;
+  currentRole: string;
+  onUpdate: () => void;
+}) {
+  const [role, setRole] = useState(currentRole ?? "eleve");
+  const [loading, setLoading] = useState(false);
+
+  const toggle = async () => {
+    const newRole = role === "professeur" ? "eleve" : "professeur";
+    setLoading(true);
+    const res = await fetch(`/api/admin/eleves/${eleveId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role: newRole }),
+    });
+    if (res.ok) {
+      setRole(newRole);
+      onUpdate();
+    }
+    setLoading(false);
+  };
+
+  const config = roleConfig[role] ?? roleConfig.eleve;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      <span
+        style={{
+          padding: "3px 10px",
+          borderRadius: "20px",
+          fontSize: "0.75rem",
+          background: config.bg,
+          color: config.color,
+        }}
+      >
+        {config.label}
+      </span>
+      <button
+        type="button"
+        onClick={toggle}
+        disabled={loading}
+        style={{
+          padding: "4px 10px",
+          background: "#2a2a2a",
+          color: "#aaa",
+          border: "none",
+          borderRadius: "6px",
+          fontSize: "0.75rem",
+          cursor: "pointer",
+        }}
+      >
+        {loading ? "…" : role === "professeur" ? "→ Élève" : "→ Prof"}
+      </button>
+    </div>
+  );
+}
 
 export default function ElevesAdminPage() {
   const [eleves, setEleves] = useState<Eleve[]>([]);
@@ -110,6 +181,7 @@ export default function ElevesAdminPage() {
                   "Forfait",
                   "Type",
                   "Statut",
+                  "Rôle",
                   "Inscrit le",
                 ].map((h) => (
                   <th
@@ -224,6 +296,17 @@ export default function ElevesAdminPage() {
                     >
                       {eleve.forfait_status === "active" ? "Actif" : "Inactif"}
                     </span>
+                  </td>
+                  <td style={{ padding: "14px 16px" }}>
+                    <RoleButton
+                      eleveId={eleve.clerk_user_id}
+                      currentRole={eleve.role ?? "eleve"}
+                      onUpdate={() => {
+                        fetch("/api/admin/eleves")
+                          .then((r) => r.json())
+                          .then((data) => setEleves(data.eleves ?? []));
+                      }}
+                    />
                   </td>
                   <td
                     style={{

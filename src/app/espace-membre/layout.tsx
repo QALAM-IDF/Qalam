@@ -6,7 +6,9 @@ import {
   getOrCreateProfile,
   getUserForfait,
   getUserProgression,
+  getUserRole,
 } from "@/lib/user";
+import { isAdmin } from "@/lib/admin";
 import { MemberProvider } from "@/context/MemberContext";
 import MemberSidebar from "@/components/membre/MemberSidebar";
 
@@ -35,18 +37,30 @@ export default async function EspaceMembreLayout({
       console.error("getUserForfait error:", e);
     }
 
+    let role = "eleve";
+    try {
+      role = await getUserRole(userId);
+    } catch (e) {
+      console.error("getUserRole error:", e);
+    }
+
+    const admin = await isAdmin();
+    const isProfOrAdmin = role === "professeur" || admin;
+
     try {
       progression = await getUserProgression(userId);
     } catch (e) {
       console.error("getUserProgression error:", e);
     }
 
-    if (!forfait) redirect("/choisir-forfait");
+    if (!forfait && !isProfOrAdmin) redirect("/choisir-forfait");
+
+    const effectiveForfait = forfait ?? (isProfOrAdmin ? "intensif" : null);
 
     const isFirstAccess =
       profile &&
       new Date(profile.created_at).getTime() > Date.now() - 60_000;
-    if (isFirstAccess && profile?.email && forfait) {
+    if (isFirstAccess && profile?.email && effectiveForfait) {
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
       if (siteUrl) {
         fetch(`${siteUrl}/api/emails/bienvenue`, {
@@ -55,7 +69,7 @@ export default async function EspaceMembreLayout({
           body: JSON.stringify({
             email: profile.email,
             firstName: profile.first_name ?? "",
-            forfait,
+            forfait: effectiveForfait,
           }),
         }).catch(() => {});
       }
@@ -65,7 +79,7 @@ export default async function EspaceMembreLayout({
       <MemberProvider
         value={{
           profile,
-          forfait,
+          forfait: effectiveForfait,
           progression: progression ?? [],
         }}
       >

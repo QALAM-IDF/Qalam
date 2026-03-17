@@ -39,6 +39,20 @@ export async function getOrCreateProfile() {
   }
 }
 
+export async function getUserRole(clerkUserId: string): Promise<string> {
+  try {
+    const supabase = createSupabaseAdmin();
+    const { data } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("clerk_user_id", clerkUserId)
+      .maybeSingle();
+    return (data?.role as string) ?? "eleve";
+  } catch {
+    return "eleve";
+  }
+}
+
 export async function getUserForfait(clerkUserId: string) {
   try {
     const supabase = createSupabaseAdmin();
