@@ -9,6 +9,7 @@ import { client, hasSanityConfig } from "@/sanity/lib/client";
 import { featuredPostsQuery } from "@/sanity/lib/queries";
 import ArticleCard from "@/components/blog/ArticleCard";
 import HomeTeachersPreview from "@/components/about/HomeTeachersPreview";
+import HomeCpfSection from "@/components/home/HomeCpfSection";
 import type { SanityPostListItem } from "@/types/sanity";
 
 const levels = [
@@ -47,6 +48,7 @@ export default async function Home() {
     <main className="overflow-hidden">
       <Hero />
       <PortalsSection />
+      <HomeCpfSection />
       <WhyUs />
       <HowItWorks />
 

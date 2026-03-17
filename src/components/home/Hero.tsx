@@ -68,15 +68,17 @@ export default function Hero() {
         </motion.div>
         <motion.p
           variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
-          className="mt-6 text-lg text-[#3d2b1f]"
+          className="font-body text-xl"
+          style={{ color: "var(--encre-douce)" }}
         >
-          Apprends l&apos;arabe. Entre dans un monde.
+          L&apos;arabe, la clé d&apos;un nouveau monde.
         </motion.p>
         <motion.p
           variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
-          className="mt-2 font-arabic text-2xl text-[#5d4124]"
+          className="mt-1 font-arabic text-lg"
+          style={{ color: "var(--or-luxe)" }}
         >
-          تعلم العربية. ادخل عالما جديدا.
+          العربية مفتاحُ عالمٍ جديد
         </motion.p>
 
         <motion.div

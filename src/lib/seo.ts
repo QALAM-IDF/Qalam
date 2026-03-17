@@ -10,7 +10,7 @@ export const defaultMetadata: Metadata = {
     template: "%s | Qalam",
   },
   description:
-    "Qalam, école de langue arabe en ligne. Cours pour hommes, femmes et enfants. Tous niveaux, du débutant au coranique.",
+    "Qalam — L'arabe, la clé d'un nouveau monde. Cours pour hommes, femmes et enfants. Éligible CPF.",
   keywords: [
     "cours arabe",
     "apprendre arabe",

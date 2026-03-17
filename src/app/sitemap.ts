@@ -15,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/femmes",
     "/enfants",
     "/tarifs",
+    "/cpf",
     "/blog",
     "/a-propos",
     "/connexion",
@@ -23,7 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
-    priority: route === "/" ? 1 : 0.8,
+    priority: route === "/" ? 1 : route === "/cpf" ? 0.9 : 0.8,
   }));
 
   const blogRoutes: MetadataRoute.Sitemap = (posts ?? []).map((p) => ({

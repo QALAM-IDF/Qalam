@@ -15,6 +15,7 @@ const links = [
   { href: "/femmes", label: "Femmes" },
   { href: "/enfants", label: "Enfants" },
   { href: "/tarifs", label: "Tarifs" },
+  { href: "/cpf", label: "CPF", labelAr: "التكوين", badge: true },
   { href: "/blog", label: "Blog" },
   { href: "/a-propos", label: "À propos" },
   { href: "#contact", label: "Contact" },
@@ -26,6 +27,7 @@ const accents: Record<string, string> = {
   "/femmes": "var(--andalou-bordeaux)",
   "/enfants": "var(--magie-turquoise)",
   "/tarifs": "var(--or-luxe)",
+  "/cpf": "var(--or-luxe)",
   "/blog": "var(--or-luxe)",
   "/a-propos": "var(--or-luxe)",
 };
@@ -78,15 +80,27 @@ export default function NavBar() {
         <div className="hidden items-center gap-6 md:flex">
           {links.map((link) => {
             const active = link.href !== "#contact" && pathname === link.href;
+            const withBadge = "badge" in link && link.badge;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className="font-display text-xl transition-opacity hover:opacity-80"
+                className="font-display text-xl transition-opacity hover:opacity-80 flex items-center gap-2"
                 style={{ color: active ? accent : "var(--encre-douce)" }}
                 onClick={() => setOpen(false)}
               >
                 {link.label}
+                {withBadge && (
+                  <span
+                    className="rounded-full px-2 py-0.5 text-xs font-medium"
+                    style={{
+                      backgroundColor: "var(--andalou-feuille)",
+                      color: "var(--blanc-ivoire)",
+                    }}
+                  >
+                    CPF
+                  </span>
+                )}
               </Link>
             );
           })}

@@ -37,6 +37,8 @@ const nunito = Nunito({
 
 export const metadata = {
   ...defaultMetadata,
+  description:
+    "Qalam — L'arabe, la clé d'un nouveau monde. Cours d'arabe en ligne pour hommes, femmes et enfants. Tous niveaux, du débutant au coranique. Formations éligibles CPF.",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
