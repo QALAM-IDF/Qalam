@@ -39,7 +39,7 @@ export default function AdminLogsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
+    queueMicrotask(() => setLoading(true));
     const url = actionFilter === "tous" ? "/api/admin/logs" : `/api/admin/logs?action=${encodeURIComponent(actionFilter)}`;
     fetch(url)
       .then((r) => r.json())
