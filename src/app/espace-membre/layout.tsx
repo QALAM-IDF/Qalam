@@ -7,6 +7,7 @@ import {
   getUserForfait,
   getUserProgression,
   getUserRole,
+  getMembersWithForfait,
 } from "@/lib/user";
 import { isAdmin } from "@/lib/admin";
 import { MemberProvider } from "@/context/MemberContext";
@@ -31,8 +32,11 @@ export default async function EspaceMembreLayout({
       console.error("getOrCreateProfile error:", e);
     }
 
+    let membersWithForfait: Awaited<ReturnType<typeof getMembersWithForfait>> = [];
     try {
       forfait = await getUserForfait(userId);
+      membersWithForfait = await getMembersWithForfait(userId);
+      if (membersWithForfait.length > 0 && !forfait) forfait = membersWithForfait[0]?.forfait ?? null;
     } catch (e) {
       console.error("getUserForfait error:", e);
     }
@@ -53,7 +57,8 @@ export default async function EspaceMembreLayout({
       console.error("getUserProgression error:", e);
     }
 
-    if (!forfait && !isProfOrAdmin) {
+    const hasAnyForfait = forfait ?? membersWithForfait.length > 0;
+    if (!hasAnyForfait && !isProfOrAdmin) {
       const supabase = (await import("@/lib/supabase/server")).createSupabaseAdmin();
       const { data: expiredPurchase } = await supabase
         .from("purchases")
@@ -90,7 +95,8 @@ export default async function EspaceMembreLayout({
       <MemberProvider
         value={{
           profile,
-          forfait: effectiveForfait,
+          members: membersWithForfait,
+          initialForfait: effectiveForfait,
           progression: progression ?? [],
         }}
       >

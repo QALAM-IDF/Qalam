@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CreditCard, Wallet, Building2, ChevronDown } from "lucide-react";
+import { CreditCard, Wallet, Building2, ChevronDown, Gamepad2, BookOpen, Repeat } from "lucide-react";
 import ArabicPattern from "@/components/shared/ArabicPattern";
 import CalligraphyDivider from "@/components/shared/CalligraphyDivider";
 import ForfaitCard from "@/components/ui/ForfaitCard";
 import ProgrammeAccordion from "@/components/ui/ProgrammeAccordion";
 import LeadModal from "@/components/ui/LeadModal";
-import { forfaits } from "@/data/forfaits";
+import { forfaitsByCategorie, forfaitsParticulier } from "@/data/forfaits";
 import { programmes } from "@/data/programmes";
+
+type TarifTab = "hommes" | "femmes" | "enfants" | "particulier";
 
 const paymentMethods = [
   {
@@ -52,10 +54,17 @@ const faqItems: { q: string; a: string }[] = [
   },
 ];
 
+const methodeKidsCards = [
+  { icon: Gamepad2, title: "Jeu", desc: "Mini-défis et cartes visuelles pour mémoriser", color: "var(--magie-turquoise)" },
+  { icon: BookOpen, title: "Histoire", desc: "Récits courts pour contextualiser chaque mot", color: "var(--magie-or)" },
+  { icon: Repeat, title: "Répétition", desc: "Révisions ritualisées et répétition active", color: "var(--magie-etoile)" },
+];
+
 export default function TarifsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedForfaitName, setSelectedForfaitName] = useState<string>("");
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
+  const [tab, setTab] = useState<TarifTab>("hommes");
 
   const openModal = (forfaitName: string) => {
     setSelectedForfaitName(forfaitName);
@@ -107,19 +116,66 @@ export default function TarifsPage() {
       </section>
 
       <section className="section-shell py-12 md:py-16">
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
+          {(["hommes", "femmes", "enfants", "particulier"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className="px-5 py-2.5 rounded-full font-body text-sm font-medium transition-all"
+              style={{
+                background: tab === t ? "var(--or-brillant)" : "var(--beige-chaud)",
+                color: tab === t ? "var(--encre-noire)" : "var(--encre-douce)",
+              }}
+            >
+              {t === "hommes" ? "Hommes" : t === "femmes" ? "Femmes" : t === "enfants" ? "Enfants" : "Cours Particuliers"}
+            </button>
+          ))}
+        </div>
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          className="flex flex-col gap-6 md:grid md:max-w-6xl md:grid-cols-3 md:gap-8 md:mx-auto"
+          key={tab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col gap-6 md:grid md:max-w-6xl md:gap-8 md:mx-auto"
+          style={{ gridTemplateColumns: tab === "particulier" ? "repeat(2, 1fr)" : undefined }}
         >
-          {forfaits.map((f) => (
-            <ForfaitCard
-              key={f.id}
-              forfait={f}
-              theme="default"
-              onSelect={() => openModal(f.name)}
-            />
+          {tab === "enfants" && (
+            <>
+              <div className="md:col-span-full mb-4">
+                <p className="text-center font-arabic text-2xl text-[var(--or-luxe)]">طريقة الأطفال</p>
+                <h2 className="mt-2 text-center font-display text-2xl text-[var(--encre-noire)]">Méthode Kids</h2>
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                  {methodeKidsCards.map((card) => (
+                    <div
+                      key={card.title}
+                      className="rounded-2xl border-2 p-5 text-center"
+                      style={{ borderColor: card.color, backgroundColor: "var(--blanc-ivoire)" }}
+                    >
+                      <card.icon className="mx-auto h-10 w-10 mb-2" style={{ color: card.color }} />
+                      <h3 className="font-display text-lg text-[var(--encre-noire)]">{card.title}</h3>
+                      <p className="text-sm mt-1 text-[var(--encre-douce)]">{card.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {forfaitsByCategorie.enfants.map((f) => (
+                <ForfaitCard
+                  key={f.id}
+                  forfait={f}
+                  theme="enfants"
+                  onSelect={() => openModal(f.name)}
+                />
+              ))}
+            </>
+          )}
+          {tab === "hommes" && forfaitsByCategorie.hommes.map((f) => (
+            <ForfaitCard key={f.id} forfait={f} theme="hommes" onSelect={() => openModal(f.name)} />
+          ))}
+          {tab === "femmes" && forfaitsByCategorie.femmes.map((f) => (
+            <ForfaitCard key={f.id} forfait={f} theme="femmes" onSelect={() => openModal(f.name)} />
+          ))}
+          {tab === "particulier" && forfaitsParticulier.map((f) => (
+            <ForfaitCard key={f.id} forfait={f} theme="default" onSelect={() => openModal(f.name)} />
           ))}
         </motion.div>
       </section>

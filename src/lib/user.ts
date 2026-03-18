@@ -53,6 +53,62 @@ export async function getUserRole(clerkUserId: string): Promise<string> {
   }
 }
 
+export type MemberWithForfait = {
+  id: string | null;
+  label: string;
+  forfait: string | null;
+};
+
+export async function getMembersWithForfait(clerkUserId: string): Promise<MemberWithForfait[]> {
+  try {
+    const supabase = createSupabaseAdmin();
+    const { data: purchases } = await supabase
+      .from("purchases")
+      .select("forfait, type, status, expires_at, family_member_id")
+      .eq("clerk_user_id", clerkUserId)
+      .eq("status", "active")
+      .order("purchased_at", { ascending: false });
+
+    if (!purchases?.length) return [];
+
+    const valid: { forfait: string; family_member_id: string | null }[] = [];
+    for (const p of purchases) {
+      if (p.type === "mensuel" && p.expires_at && new Date(p.expires_at) < new Date()) continue;
+      valid.push({ forfait: p.forfait ?? "", family_member_id: p.family_member_id ?? null });
+    }
+
+    const members: MemberWithForfait[] = [];
+    const seen = new Set<string | null>();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("first_name, last_name")
+      .eq("clerk_user_id", clerkUserId)
+      .maybeSingle();
+
+    for (const v of valid) {
+      if (seen.has(v.family_member_id)) continue;
+      seen.add(v.family_member_id);
+      if (v.family_member_id === null) {
+        const label = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ").trim() || "Moi-même";
+        members.push({ id: null, label, forfait: v.forfait });
+      } else {
+        const { data: fm } = await supabase
+          .from("family_members")
+          .select("prenom, nom")
+          .eq("id", v.family_member_id)
+          .eq("clerk_user_id", clerkUserId)
+          .maybeSingle();
+        const label = fm ? [fm.prenom, fm.nom].filter(Boolean).join(" ").trim() : "Membre";
+        members.push({ id: v.family_member_id, label, forfait: v.forfait });
+      }
+    }
+    return members;
+  } catch (error) {
+    console.error("getMembersWithForfait error:", error);
+    return [];
+  }
+}
+
 export async function getUserForfait(clerkUserId: string): Promise<string | null> {
   try {
     const supabase = createSupabaseAdmin();

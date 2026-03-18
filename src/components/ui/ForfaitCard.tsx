@@ -2,9 +2,33 @@
 
 import { motion } from "framer-motion";
 import { Clock, User, Users, Video, Calendar, Check } from "lucide-react";
-import type { Forfait } from "@/data/forfaits";
+import type { Forfait, ForfaitType } from "@/data/forfaits";
 import CalligraphyDivider from "@/components/shared/CalligraphyDivider";
 import { useMobile } from "@/hooks/useMobile";
+
+function FormatBadge({ format }: { format: ForfaitType }) {
+  const config: Record<ForfaitType, { label: string; color: string }> = {
+    youtube: { label: "🎬 Vidéos YouTube", color: "#ff0000" },
+    zoom: { label: "📹 Zoom en direct", color: "#2D8CFF" },
+    "youtube-zoom": { label: "🎬 YouTube + 📹 Zoom", color: "#b8860b" },
+  };
+  const { label, color } = config[format];
+  return (
+    <span
+      style={{
+        padding: "2px 10px",
+        borderRadius: 20,
+        fontSize: "0.75rem",
+        background: `${color}15`,
+        color,
+        border: `1px solid ${color}40`,
+        fontWeight: 600,
+      }}
+    >
+      {label}
+    </span>
+  );
+}
 
 type ForfaitCardProps = {
   forfait: Forfait;
@@ -76,6 +100,9 @@ export default function ForfaitCard({ forfait, theme = "default", onSelect }: Fo
       )}
 
       <header className="mb-4">
+        <div className="mb-2">
+          <FormatBadge format={forfait.format} />
+        </div>
         <p className="font-arabic text-3xl leading-none md:text-4xl" style={{ color: styles.accentText }}>
           {forfait.nameAr}
         </p>
@@ -116,7 +143,7 @@ export default function ForfaitCard({ forfait, theme = "default", onSelect }: Fo
         </li>
         <li className="flex items-center gap-2">
           <Video className="h-4 w-4 shrink-0" style={{ color: styles.accent }} />
-          <span>{forfait.format}</span>
+          <span>{forfait.format === "youtube" ? "Vidéos en ligne" : forfait.format === "zoom" ? "Cours en direct" : "YouTube + Zoom"}</span>
         </li>
         <li className="flex items-center gap-2">
           <Calendar className="h-4 w-4 shrink-0" style={{ color: styles.accent }} />

@@ -14,6 +14,15 @@ const forfaitPrix: Record<string, number> = {
   decouverte: 120,
   essentiel: 299,
   intensif: 490,
+  "hommes-decouverte": 120,
+  "hommes-essentiel": 299,
+  "hommes-particulier": 490,
+  "femmes-decouverte": 120,
+  "femmes-essentiel": 299,
+  "femmes-particulier": 490,
+  "enfant-5-8": 149,
+  "enfant-9-12": 179,
+  "enfant-13-15": 219,
 };
 
 async function alertAdmin(
@@ -112,6 +121,8 @@ export async function POST(req: NextRequest) {
     const clerk_user_id = session.metadata?.clerk_user_id as string | undefined;
     const forfait = session.metadata?.forfait as string | undefined;
     const type = (session.metadata?.type as string) ?? "unique";
+    const family_member_id = (session.metadata?.family_member_id as string) || null;
+    const _categorie = session.metadata?.categorie as string | undefined;
 
     if (!clerk_user_id || !forfait) {
       console.error("Missing metadata:", { clerk_user_id, forfait, type });
@@ -165,6 +176,7 @@ export async function POST(req: NextRequest) {
       clerk_user_id,
       forfait,
       type: type ?? "unique",
+      family_member_id: family_member_id || null,
       stripe_session_id: session.id,
       stripe_customer_id: (session.customer as string) ?? null,
       stripe_subscription_id: (session.subscription as string) ?? null,

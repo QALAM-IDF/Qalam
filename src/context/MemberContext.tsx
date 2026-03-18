@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useState, useMemo, type ReactNode } from "react";
+import type { MemberWithForfait } from "@/lib/user";
 
 export type Profile = {
   id: string;
@@ -29,6 +30,9 @@ type MemberContextValue = {
   profile: Profile;
   forfait: string | null;
   progression: LessonProgressItem[];
+  members: MemberWithForfait[];
+  selectedMemberId: string | null;
+  setSelectedMemberId: (id: string | null) => void;
 };
 
 const MemberContext = createContext<MemberContextValue | null>(null);
@@ -38,10 +42,27 @@ export function MemberProvider({
   value,
 }: {
   children: ReactNode;
-  value: MemberContextValue;
+  value: Omit<MemberContextValue, "forfait" | "selectedMemberId" | "setSelectedMemberId"> & { initialForfait: string | null };
 }) {
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+  const { members, initialForfait } = value;
+  const forfait = useMemo(() => {
+    if (!members.length) return initialForfait;
+    const m = selectedMemberId
+      ? members.find((x) => x.id === selectedMemberId)
+      : members[0];
+    return m?.forfait ?? initialForfait;
+  }, [members, selectedMemberId, initialForfait]);
+
+  const ctxValue: MemberContextValue = {
+    ...value,
+    forfait,
+    members,
+    selectedMemberId,
+    setSelectedMemberId,
+  };
   return (
-    <MemberContext.Provider value={value}>{children}</MemberContext.Provider>
+    <MemberContext.Provider value={ctxValue}>{children}</MemberContext.Provider>
   );
 }
 

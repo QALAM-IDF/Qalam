@@ -13,6 +13,15 @@ const forfaitLabels: Record<string, string> = {
   decouverte: "Découverte",
   essentiel: "Essentiel",
   intensif: "Intensif",
+  "hommes-decouverte": "Découverte",
+  "hommes-essentiel": "Essentiel",
+  "hommes-particulier": "Particulier",
+  "femmes-decouverte": "Découverte",
+  "femmes-essentiel": "Essentiel",
+  "femmes-particulier": "Particulier",
+  "enfant-5-8": "Enfants 5-8 ans",
+  "enfant-9-12": "Enfants 9-12 ans",
+  "enfant-13-15": "Enfants 13-15 ans",
 };
 
 function useProgressionByCourse(progression: { course_id: string; lesson_id: string; completed: boolean }[]) {

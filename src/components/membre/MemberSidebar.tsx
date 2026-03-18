@@ -18,14 +18,25 @@ const forfaitLabels: Record<string, string> = {
   decouverte: "Découverte",
   essentiel: "Essentiel",
   intensif: "Intensif",
+  "hommes-decouverte": "Découverte",
+  "hommes-essentiel": "Essentiel",
+  "hommes-particulier": "Particulier",
+  "femmes-decouverte": "Découverte",
+  "femmes-essentiel": "Essentiel",
+  "femmes-particulier": "Particulier",
+  "enfant-5-8": "Enfants 5-8 ans",
+  "enfant-9-12": "Enfants 9-12 ans",
+  "enfant-13-15": "Enfants 13-15 ans",
 };
 
 export default function MemberSidebar() {
   const pathname = usePathname();
   const isMobile = useMobile(768);
-  const { profile, forfait } = useMember();
+  const { profile, forfait, members, selectedMemberId, setSelectedMemberId } = useMember();
   const firstName = profile?.first_name ?? "";
   const lastName = profile?.last_name ?? "";
+  const currentMember = selectedMemberId ? members.find((m) => m.id === selectedMemberId) : members[0];
+  const showMemberSelector = members.length > 1;
 
   if (isMobile) {
     return (
@@ -72,6 +83,29 @@ export default function MemberSidebar() {
         </Link>
       </div>
       <div className="flex flex-1 flex-col p-4">
+        {showMemberSelector && (
+          <div className="mb-4">
+            <p className="text-xs mb-2" style={{ color: "var(--encre-douce)" }}>
+              Pour qui consultez-vous ?
+            </p>
+            <select
+              value={selectedMemberId ?? (members[0]?.id ?? "")}
+              onChange={(e) => setSelectedMemberId(e.target.value || null)}
+              className="w-full rounded-lg border px-3 py-2 text-sm"
+              style={{
+                background: "var(--beige-creme)",
+                borderColor: "var(--or-brillant)",
+                color: "var(--encre-noire)",
+              }}
+            >
+              {members.map((m) => (
+                <option key={m.id ?? "self"} value={m.id ?? ""}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="mb-6 flex items-center gap-3">
           <div
             className="flex h-10 w-10 items-center justify-center rounded-full font-display text-lg font-semibold"
@@ -80,18 +114,14 @@ export default function MemberSidebar() {
               color: "var(--encre-noire)",
             }}
           >
-            {firstName[0] ?? ""}
-            {lastName[0] ?? ""}
+            {currentMember ? currentMember.label.slice(0, 2).toUpperCase() : (firstName[0] ?? "") + (lastName[0] ?? "")}
           </div>
           <div>
             <p className="font-display font-medium" style={{ color: "var(--beige-creme)" }}>
-              {firstName} {lastName}
+              {(currentMember?.label ?? `${firstName} ${lastName}`.trim()) || "Membre"}
             </p>
-            <span
-              className="text-xs"
-              style={{ color: "var(--or-brillant)" }}
-            >
-              {forfaitLabels[forfait ?? ""]}
+            <span className="text-xs" style={{ color: "var(--or-brillant)" }}>
+              {forfaitLabels[forfait ?? ""] ?? (forfait ?? "")}
             </span>
           </div>
         </div>

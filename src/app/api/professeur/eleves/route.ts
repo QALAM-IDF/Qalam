@@ -55,28 +55,69 @@ export async function GET() {
       const profileUnivers = (profile as { univers?: string }).univers;
       if (profileUnivers && !specialites.includes(profileUnivers)) continue;
 
-      const { data: purchase } = await supabase
+      const { data: purchases } = await supabase
         .from("purchases")
-        .select("forfait, status, type, purchased_at")
+        .select("forfait, status, type, purchased_at, family_member_id")
         .eq("clerk_user_id", eid)
         .eq("status", "active")
-        .order("purchased_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .order("purchased_at", { ascending: false });
 
       const { data: progress } = await supabase
         .from("lesson_progress")
         .select("course_id, lesson_id, completed, quiz_score")
         .eq("clerk_user_id", eid);
 
-      elevesWithProgress.push({
-        ...profile,
-        forfait: purchase?.forfait ?? null,
-        forfait_status: purchase?.status ?? null,
-        forfait_type: purchase?.type ?? null,
-        purchased_at: purchase?.purchased_at ?? null,
-        lesson_progress: progress ?? [],
-      });
+      const profileName = [profile.first_name, profile.last_name].filter(Boolean).join(" ").trim() || profile.email || "—";
+      const slots: { family_member_id: string | null; forfait: string; status: string; type: string; purchased_at: string | null }[] = [];
+      for (const p of purchases ?? []) {
+        slots.push({
+          family_member_id: p.family_member_id ?? null,
+          forfait: p.forfait ?? "",
+          status: p.status ?? "active",
+          type: p.type ?? "unique",
+          purchased_at: p.purchased_at ?? null,
+        });
+      }
+      if (slots.length === 0) {
+        elevesWithProgress.push({
+          ...profile,
+          forfait: null,
+          forfait_status: null,
+          forfait_type: null,
+          purchased_at: null,
+          lesson_progress: progress ?? [],
+          family_member_id: null,
+          display_name: profileName,
+        });
+        continue;
+      }
+      const { data: familyMembers } = await supabase
+        .from("family_members")
+        .select("id, prenom, nom, categorie")
+        .eq("clerk_user_id", eid);
+
+      for (const slot of slots) {
+        const displayName =
+          slot.family_member_id === null
+            ? profileName
+            : (familyMembers ?? []).find((fm) => fm.id === slot.family_member_id)
+              ? `${(familyMembers ?? []).find((fm) => fm.id === slot.family_member_id)!.prenom} ${((familyMembers ?? []).find((fm) => fm.id === slot.family_member_id)!.nom ?? "").trim()}`.trim()
+              : "Membre";
+        const categorie = slot.family_member_id !== null
+          ? (familyMembers ?? []).find((fm) => fm.id === slot.family_member_id)?.categorie ?? null
+          : null;
+        elevesWithProgress.push({
+          ...profile,
+          forfait: slot.forfait,
+          forfait_status: slot.status,
+          forfait_type: slot.type,
+          purchased_at: slot.purchased_at,
+          lesson_progress: progress ?? [],
+          family_member_id: slot.family_member_id,
+          display_name: displayName,
+          membre_categorie: categorie,
+        });
+      }
     }
 
     return NextResponse.json({ eleves: elevesWithProgress });

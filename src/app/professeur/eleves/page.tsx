@@ -9,10 +9,13 @@ type Eleve = {
   first_name?: string | null;
   last_name?: string | null;
   email?: string | null;
+  display_name?: string | null;
   forfait?: string | null;
   forfait_status?: string | null;
   forfait_type?: string | null;
   purchased_at?: string | null;
+  family_member_id?: string | null;
+  membre_categorie?: string | null;
   lesson_progress?: Array<{ course_id: string; lesson_id: string; completed?: boolean }>;
 };
 
@@ -116,14 +119,14 @@ export default function ProfesseurElevesPage() {
             </thead>
             <tbody>
               {filtered.map((e) => {
-                const name = [e.first_name, e.last_name].filter(Boolean).join(" ") || e.email || "—";
+                const name = e.display_name ?? ([e.first_name, e.last_name].filter(Boolean).join(" ") || e.email || "—");
                 const pct = progressPercent(e.lesson_progress);
                 const lastActivity = e.purchased_at
                   ? new Date(e.purchased_at).toLocaleDateString("fr-FR")
                   : "—";
                 return (
                   <tr
-                    key={e.clerk_user_id}
+                    key={`${e.clerk_user_id}-${e.family_member_id ?? "self"}`}
                     className="border-t transition-colors hover:bg-[rgba(255,255,255,0.03)]"
                     style={{ borderColor: "#1a2a1a" }}
                   >
@@ -149,7 +152,7 @@ export default function ProfesseurElevesPage() {
                     </td>
                     <td className="p-4">
                       <span
-                        className="rounded px-2 py-0.5 text-xs"
+                        className="rounded px-2 py-0.5 text-xs mr-1"
                         style={{
                           background: "rgba(212, 175, 55, 0.2)",
                           color: "var(--or-brillant)",
@@ -157,6 +160,17 @@ export default function ProfesseurElevesPage() {
                       >
                         {e.forfait ?? "—"}
                       </span>
+                      {e.membre_categorie && (
+                        <span
+                          className="rounded px-2 py-0.5 text-xs"
+                          style={{
+                            background: "rgba(74, 222, 128, 0.2)",
+                            color: "#4ade80",
+                          }}
+                        >
+                          {e.membre_categorie}
+                        </span>
+                      )}
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
