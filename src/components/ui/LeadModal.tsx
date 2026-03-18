@@ -144,7 +144,7 @@ export default function LeadModal({
                   padding: "8px",
                   color: "var(--encre-douce)",
                 }}
-                aria-label="Fermer"
+                aria-label="Fermer le formulaire"
               >
                 <X size={20} />
               </button>
@@ -205,6 +205,7 @@ export default function LeadModal({
                   {fields.map((field) => (
                     <div key={field.name}>
                       <label
+                        htmlFor={`lead-${field.name}`}
                         style={{
                           display: "block",
                           marginBottom: "6px",
@@ -216,11 +217,13 @@ export default function LeadModal({
                         {field.label}
                       </label>
                       <input
+                        id={`lead-${field.name}`}
                         type={field.type ?? "text"}
                         value={formData[field.name] ?? ""}
                         onChange={(e) =>
                           handleChange(field.name, e.target.value)
                         }
+                        aria-required={!field.label.toLowerCase().includes("optionnel")}
                         style={{
                           width: "100%",
                           padding: "12px 16px",
@@ -245,6 +248,7 @@ export default function LeadModal({
 
                   <div>
                     <label
+                      htmlFor="lead-message"
                       style={{
                         display: "block",
                         marginBottom: "6px",
@@ -256,6 +260,7 @@ export default function LeadModal({
                       Message (optionnel)
                     </label>
                     <textarea
+                      id="lead-message"
                       name="message"
                       value={formData["message"] ?? ""}
                       onChange={(e) =>
@@ -281,6 +286,8 @@ export default function LeadModal({
 
                 {error && (
                   <p
+                    role="alert"
+                    aria-live="polite"
                     style={{
                       color: "#c0392b",
                       fontSize: "0.875rem",

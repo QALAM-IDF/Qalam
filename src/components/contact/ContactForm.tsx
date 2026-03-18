@@ -86,30 +86,35 @@ export function ContactForm() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <div>
-        <label style={labelStyle}>Nom complet *</label>
+        <label htmlFor="contact-name" style={labelStyle}>Nom complet *</label>
         <input
+          id="contact-name"
           type="text"
           style={inputStyle}
           value={formData.name}
           onChange={(e) =>
             setFormData((p) => ({ ...p, name: e.target.value }))
           }
+          aria-required
         />
       </div>
       <div>
-        <label style={labelStyle}>Email *</label>
+        <label htmlFor="contact-email" style={labelStyle}>Email *</label>
         <input
+          id="contact-email"
           type="email"
           style={inputStyle}
           value={formData.email}
           onChange={(e) =>
             setFormData((p) => ({ ...p, email: e.target.value }))
           }
+          aria-required
         />
       </div>
       <div>
-        <label style={labelStyle}>Sujet</label>
+        <label htmlFor="contact-subject" style={labelStyle}>Sujet</label>
         <input
+          id="contact-subject"
           type="text"
           style={inputStyle}
           placeholder="Ex: Question sur le forfait Essentiel"
@@ -120,19 +125,23 @@ export function ContactForm() {
         />
       </div>
       <div>
-        <label style={labelStyle}>Message *</label>
+        <label htmlFor="contact-message" style={labelStyle}>Message *</label>
         <textarea
+          id="contact-message"
           rows={5}
           style={{ ...inputStyle, resize: "vertical" }}
           value={formData.message}
           onChange={(e) =>
             setFormData((p) => ({ ...p, message: e.target.value }))
           }
+          aria-required
         />
       </div>
 
       {error && (
         <p
+          role="alert"
+          aria-live="polite"
           style={{
             color: "var(--andalou-bordeaux)",
             fontSize: "0.875rem",

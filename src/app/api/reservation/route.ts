@@ -1,28 +1,32 @@
+import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdmin } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/emails";
 import { NotificationAdminEmail } from "@/lib/emails/templates/NotificationAdminEmail";
 
+const ReservationSchema = z
+  .object({
+    email: z.string().email(),
+    name: z.string().min(1).max(100).optional(),
+    firstName: z.string().min(1).max(50).optional(),
+    subject: z.string().max(200).optional(),
+    message: z.string().max(2000).optional(),
+  })
+  .passthrough();
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const {
-      subject,
-      name,
-      firstName,
-      email,
-      message,
-      ...rest
-    } = body as {
-      subject?: string;
-      name?: string;
-      firstName?: string;
-      email?: string;
-      message?: string;
-      [key: string]: unknown;
-    };
+    const body = await req.json().catch(() => null);
+    const parsed = ReservationSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Email invalide ou données manquantes" },
+        { status: 400 }
+      );
+    }
+    const { subject, name, firstName, email, message, ...rest } = parsed.data;
 
-    const displayName = (name ?? firstName ?? "Inconnu") as string;
+    const displayName = name ?? firstName ?? "Inconnu";
     const subjectVal = subject ?? "Formulaire de contact";
     const messageVal = message ?? JSON.stringify(rest);
     const sourceVal = subject ?? "contact";

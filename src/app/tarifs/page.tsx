@@ -63,7 +63,7 @@ export default function TarifsPage() {
   };
 
   return (
-    <main className="overflow-hidden bg-[var(--beige-creme)] pt-20">
+    <main id="main-content" className="overflow-hidden bg-[var(--beige-creme)] pt-20">
       <section className="grain-surface relative overflow-hidden bg-[var(--beige-creme)] pb-16 pt-12">
         <ArabicPattern
           className="pointer-events-none"

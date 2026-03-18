@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdmin } from "@/lib/supabase/server";
@@ -5,23 +6,27 @@ import { logAccess, LOG_ACTIONS } from "@/lib/logging";
 
 export const dynamic = "force-dynamic";
 
+const ProgressionSchema = z.object({
+  courseId: z.string().min(1).max(100),
+  lessonId: z.string().min(1).max(100),
+  quizScore: z.number().int().min(0).max(100).optional(),
+  watchTimeSeconds: z.number().int().min(0).optional(),
+});
+
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId)
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
-  const body = await req.json();
-  const { courseId, lessonId, quizScore } = body as {
-    courseId?: string;
-    lessonId?: string;
-    quizScore?: number;
-  };
-
-  if (!courseId || !lessonId)
+  const body = await req.json().catch(() => null);
+  const parsed = ProgressionSchema.safeParse(body);
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: "courseId et lessonId requis" },
+      { error: "Données invalides", details: parsed.error.flatten() },
       { status: 400 }
     );
+  }
+  const { courseId, lessonId, quizScore } = parsed.data;
 
   const supabase = createSupabaseAdmin();
 

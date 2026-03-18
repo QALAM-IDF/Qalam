@@ -46,7 +46,8 @@ export default function VideoPlayer({
       <div className="relative aspect-video">
         <iframe
           src={`https://www.youtube-nocookie.com/embed/${youtubeId}`}
-          title={title}
+          title={`Leçon : ${title}`}
+          aria-label={`Vidéo de la leçon : ${title}`}
           className="absolute inset-0 h-full w-full rounded-t-xl"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
@@ -74,6 +75,7 @@ export default function VideoPlayer({
             type="button"
             onClick={handleMarkComplete}
             disabled={completed}
+            aria-label={completed ? `Leçon "${title}" marquée comme terminée` : `Marquer la leçon "${title}" comme terminée`}
             className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium ${
               completed ? "opacity-80" : ""
             }`}

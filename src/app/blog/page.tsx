@@ -36,7 +36,7 @@ export default async function BlogPage() {
   const featuredFirst = featured?.[0];
 
   return (
-    <main className="overflow-hidden bg-[var(--beige-creme)] pt-20">
+    <main id="main-content" className="overflow-hidden bg-[var(--beige-creme)] pt-20">
       <section className="section-shell pt-12 pb-16 text-center grain-overlay">
         <p
           className="font-arabic text-3xl mb-2"

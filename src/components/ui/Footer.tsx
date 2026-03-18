@@ -11,6 +11,7 @@ export default function Footer() {
 
   return (
     <footer
+      role="contentinfo"
       id="contact"
       className="relative overflow-hidden border-t border-[#d4af3766] bg-[var(--blanc-ivoire)] grain-surface"
     >

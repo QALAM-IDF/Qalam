@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { forfaits } from "@/data/forfaits";
 import { QalamLogo } from "@/components/shared/QalamLogo";
+import { CPFButton } from "@/components/ui/CPFButton";
 import { Check, Loader2 } from "lucide-react";
 
 type PaymentType = "unique" | "mensuel" | "cpf";
@@ -179,11 +180,8 @@ export default function ChoisirForfaitClient() {
                   Débutant → Avancé → Coranique. Modules certifiés, professeurs
                   natifs.
                 </p>
-                {/* TODO: remplacer par vrai lien CPF Arabe */}
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <CPFButton
+                  langue="arabe"
                   className="block w-full py-3 rounded-full text-center font-display transition-all"
                   style={{
                     background: "var(--or-brillant)",
@@ -192,7 +190,7 @@ export default function ChoisirForfaitClient() {
                   }}
                 >
                   S&apos;inscrire avec mon CPF →
-                </a>
+                </CPFButton>
               </div>
 
               <div
@@ -221,11 +219,8 @@ export default function ChoisirForfaitClient() {
                   Débutant → Business. Modules adaptés à vos objectifs
                   professionnels.
                 </p>
-                {/* TODO: remplacer par vrai lien CPF Anglais */}
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <CPFButton
+                  langue="anglais"
                   className="block w-full py-3 rounded-full text-center font-display transition-all"
                   style={{
                     background: "var(--magie-turquoise)",
@@ -234,7 +229,7 @@ export default function ChoisirForfaitClient() {
                   }}
                 >
                   S&apos;inscrire avec mon CPF →
-                </a>
+                </CPFButton>
               </div>
             </div>
 

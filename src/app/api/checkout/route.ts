@@ -1,8 +1,14 @@
 export const dynamic = "force-dynamic";
 
 import Stripe from "stripe";
+import { z } from "zod";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+
+const CheckoutSchema = z.object({
+  forfait: z.enum(["decouverte", "essentiel", "intensif"]),
+  type: z.enum(["unique", "mensuel"]),
+});
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -27,10 +33,17 @@ export async function POST(req: NextRequest) {
   if (!userId)
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
-  const body = await req.json();
-  const { forfait, type } = body as { forfait?: string; type?: string };
-  const priceId = forfait && type ? PRICE_MAP[forfait]?.[type] : undefined;
-  if (!priceId || !forfait || !type)
+  const body = await req.json().catch(() => null);
+  const parsed = CheckoutSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Données invalides", details: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+  const { forfait, type } = parsed.data;
+  const priceId = PRICE_MAP[forfait]?.[type];
+  if (!priceId)
     return NextResponse.json({ error: "Forfait invalide" }, { status: 400 });
 
   const isSubscription = type === "mensuel";

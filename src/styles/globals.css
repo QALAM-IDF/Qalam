@@ -48,6 +48,24 @@
   box-sizing: border-box;
 }
 
+/* Focus visible pour navigation clavier */
+:focus-visible {
+  outline: 2px solid var(--or-brillant);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.admin-layout :focus-visible,
+.prof-layout :focus-visible,
+.membre-layout :focus-visible {
+  outline: 2px solid #d4af37;
+  outline-offset: 3px;
+}
+
 html,
 body {
   margin: 0;

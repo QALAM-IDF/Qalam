@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <main>
+    <main id="main-content">
       <section
         className="relative pt-32 pb-16 text-center grain-overlay overflow-hidden"
         style={{ background: "var(--beige-creme)" }}

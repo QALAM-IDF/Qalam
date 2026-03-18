@@ -45,7 +45,7 @@ export default async function Home() {
     : [];
 
   return (
-    <main className="overflow-hidden">
+    <main id="main-content" className="overflow-hidden">
       <Hero />
       <PortalsSection />
       <HomeCpfSection />

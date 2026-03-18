@@ -1,8 +1,15 @@
 export const dynamic = "force-dynamic";
 
+import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin";
 import { createSupabaseAdmin } from "@/lib/supabase/server";
+
+const UpdateEleveSchema = z.object({
+  role: z.enum(["eleve", "professeur", "admin"]).optional(),
+  specialites: z.array(z.enum(["hommes", "femmes", "enfants"])).optional(),
+  is_admin: z.boolean().optional(),
+});
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -10,8 +17,15 @@ export async function PUT(req: NextRequest, { params }: Params) {
   try {
     await requireAdmin();
     const { id } = await params;
-    const body = await req.json().catch(() => ({}));
-    const { role, specialites, is_admin } = body;
+    const body = await req.json().catch(() => null);
+    const parsed = UpdateEleveSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Données invalides", details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+    const { role, specialites, is_admin } = parsed.data;
 
     const supabase = createSupabaseAdmin();
     const update: Record<string, unknown> = { updated_at: new Date().toISOString() };

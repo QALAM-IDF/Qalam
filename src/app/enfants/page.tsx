@@ -15,7 +15,7 @@ export default function EnfantsPage() {
   const [open, setOpen] = useState(false);
 
   return (
-    <main className="overflow-hidden bg-[#0a0a2e] pt-20 text-[#fff8dc]">
+    <main id="main-content" className="overflow-hidden bg-[#0a0a2e] pt-20 text-[#fff8dc]">
       <section className="grain-overlay relative min-h-[85vh] overflow-hidden bg-gradient-to-b from-[#0d1b4b] via-[#1a3a6b] to-[#0a0a2e] py-16">
         <StarField />
         <div className="section-shell relative">

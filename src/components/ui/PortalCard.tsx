@@ -104,6 +104,7 @@ export default function PortalCard({
             <p className="max-w-[32ch] text-sm leading-relaxed text-white/90">{description}</p>
             <Link
               href={href}
+              aria-label={`Accéder aux cours ${title_fr}`}
               className="mt-5 inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 rounded-full border border-white/45 px-4 py-2 text-sm transition-colors hover:bg-white/15"
             >
               {config.cta} <span aria-hidden>→</span>
@@ -137,6 +138,7 @@ export default function PortalCard({
                 <p className="text-sm leading-relaxed text-white/90">{description}</p>
                 <Link
                   href={href}
+                  aria-label={`Accéder aux cours ${title_fr}`}
                   className="mt-4 flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 rounded-full border border-white/45 bg-white/10 px-5 py-3 text-sm text-white transition-colors active:bg-white/20"
                   onClick={() => setPanelOpen(false)}
                 >

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 export type LessonFormData = {
   id: string;
@@ -73,11 +74,14 @@ export function LessonForm({ lesson, onChange, onRemove }: LessonFormProps) {
           style={{ borderColor: "#2a2a2a", color: "#fff" }}
         />
         {local.youtube_id && (
-          <div className="mt-2">
-            <img
+          <div className="mt-2 relative max-w-[320px]">
+            <Image
               src={`https://img.youtube.com/vi/${local.youtube_id}/mqdefault.jpg`}
-              alt="Miniature YouTube"
-              className="max-w-[320px] rounded border"
+              alt={`Miniature de la leçon : ${local.title || "aperçu vidéo"}`}
+              width={320}
+              height={180}
+              unoptimized
+              className="rounded border"
               style={{ borderColor: "#2a2a2a" }}
             />
           </div>

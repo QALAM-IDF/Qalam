@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import ArabicPattern from "@/components/shared/ArabicPattern";
 import CalligraphyDivider from "@/components/shared/CalligraphyDivider";
+import { CPFButton } from "@/components/ui/CPFButton";
 
 const faqCPF: { q: string; a: string }[] = [
   {
@@ -67,7 +68,7 @@ export default function CpfPage() {
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
 
   return (
-    <main className="overflow-hidden">
+    <main id="main-content" className="overflow-hidden">
       {/* Section 1 — Hero CPF */}
       <section
         className="grain-overlay grain-surface relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-6 py-24 text-center"
@@ -312,9 +313,8 @@ export default function CpfPage() {
               ))}
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-4">
-              {/* TODO: remplacer par vrai lien formation Arabe CPF */}
-              <a
-                href="#"
+              <CPFButton
+                langue="arabe"
                 className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-display text-sm font-medium transition-opacity hover:opacity-90"
                 style={{
                   background: "var(--or-brillant)",
@@ -322,7 +322,7 @@ export default function CpfPage() {
                 }}
               >
                 Voir la formation Arabe
-              </a>
+              </CPFButton>
               <span
                 className="rounded-full px-3 py-1 text-xs font-medium"
                 style={{
@@ -378,9 +378,8 @@ export default function CpfPage() {
               ))}
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-4">
-              {/* TODO: remplacer par vrai lien formation Anglais CPF */}
-              <a
-                href="#"
+              <CPFButton
+                langue="anglais"
                 className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-display text-sm font-medium transition-opacity hover:opacity-90"
                 style={{
                   background: "var(--or-brillant)",
@@ -388,7 +387,7 @@ export default function CpfPage() {
                 }}
               >
                 Voir la formation Anglais
-              </a>
+              </CPFButton>
               <span
                 className="rounded-full px-3 py-1 text-xs font-medium"
                 style={{
@@ -490,12 +489,9 @@ export default function CpfPage() {
           directement à Mon Compte Formation.
         </p>
         <div className="mx-auto mt-10 flex max-w-2xl flex-col gap-4 sm:flex-row sm:justify-center">
-          {/* TODO: remplacer par vrai lien Mon Compte Formation Arabe */}
-          <a
-            href="#"
+          <CPFButton
+            langue="arabe"
             id="lien-cpf-arabe"
-            target="_blank"
-            rel="noopener noreferrer"
             className="inline-flex min-h-[56px] flex-1 items-center justify-center gap-2 rounded-full px-8 py-4 font-display text-lg font-medium transition-opacity hover:opacity-90 sm:flex-initial"
             style={{
               background: "var(--or-brillant)",
@@ -503,13 +499,10 @@ export default function CpfPage() {
             }}
           >
             🎓 S&apos;inscrire avec mon CPF — Arabe
-          </a>
-          {/* TODO: remplacer par vrai lien Mon Compte Formation Anglais */}
-          <a
-            href="#"
+          </CPFButton>
+          <CPFButton
+            langue="anglais"
             id="lien-cpf-anglais"
-            target="_blank"
-            rel="noopener noreferrer"
             className="inline-flex min-h-[56px] flex-1 items-center justify-center gap-2 rounded-full px-8 py-4 font-display text-lg font-medium transition-opacity hover:opacity-90 sm:flex-initial"
             style={{
               background: "var(--encre-noire)",
@@ -517,7 +510,7 @@ export default function CpfPage() {
             }}
           >
             🎓 S&apos;inscrire avec mon CPF — Anglais
-          </a>
+          </CPFButton>
         </div>
         <p
           className="mx-auto mt-6 max-w-lg text-center text-xs"

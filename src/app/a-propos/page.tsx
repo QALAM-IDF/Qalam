@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function AProposPage() {
   return (
-    <main className="overflow-hidden bg-[var(--beige-creme)] pt-20">
+    <main id="main-content" className="overflow-hidden bg-[var(--beige-creme)] pt-20">
       {/* 1. Hero */}
       <section className="grain-overlay relative section-shell pt-16 pb-20">
         <ArabicPattern

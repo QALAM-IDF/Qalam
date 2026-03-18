@@ -22,7 +22,7 @@ export default function HommesPage() {
   const [open, setOpen] = useState(false);
 
   return (
-    <main className="overflow-hidden bg-[#1a0800] pt-20 text-[#f5e6c8]">
+    <main id="main-content" className="overflow-hidden bg-[#1a0800] pt-20 text-[#f5e6c8]">
       <section className="grain-surface grain-overlay relative min-h-[88vh] bg-gradient-to-b from-[#8b5e3c] via-[#3d1f0a] to-[#1a0800] py-16">
         <SandParticles />
         <div className="section-shell px-4">

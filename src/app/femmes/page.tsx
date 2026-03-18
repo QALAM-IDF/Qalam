@@ -16,7 +16,7 @@ export default function FemmesPage() {
   const [open, setOpen] = useState(false);
 
   return (
-    <main className="overflow-hidden bg-[#f7efe3] pt-20 text-[#3f2a1f]">
+    <main id="main-content" className="overflow-hidden bg-[#f7efe3] pt-20 text-[#3f2a1f]">
       <section className="grain-surface grain-overlay relative min-h-[85vh] overflow-hidden bg-gradient-to-b from-[#e8c4a0] via-[#a67c52] to-[#2d4a2d] py-16 text-[#fdf3e8]">
         <ArabicPattern
           className="pointer-events-none"

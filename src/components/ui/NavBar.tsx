@@ -67,6 +67,7 @@ export default function NavBar() {
 
   return (
     <header
+      role="banner"
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         scrolled ? "bg-[#f5efe0d4] shadow-sm backdrop-blur-md" : "bg-transparent"
       }`}
@@ -76,6 +77,7 @@ export default function NavBar() {
           href="/"
           className={`flex items-center ${isMobile ? "absolute left-1/2 -translate-x-1/2" : ""}`}
           onClick={() => setOpen(false)}
+          aria-label="Qalam — Retour à l'accueil"
         >
           <QalamLogo height={44} invert={isDarkPage} />
         </Link>
@@ -146,8 +148,9 @@ export default function NavBar() {
             isMobile ? "absolute right-4 top-1/2 -translate-y-1/2 z-[52]" : ""
           }`}
           onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-label={open ? "Fermer le menu de navigation" : "Ouvrir le menu de navigation"}
           aria-expanded={open}
+          aria-controls="mobile-menu"
         >
           <AnimatePresence mode="wait">
             {open ? (
@@ -178,6 +181,9 @@ export default function NavBar() {
       <AnimatePresence>
         {open && (
           <motion.div
+            id="mobile-menu"
+            role="navigation"
+            aria-label="Navigation principale"
             initial={{ opacity: 0, y: "-100%" }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: "-100%" }}
