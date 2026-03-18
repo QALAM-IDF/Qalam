@@ -9,6 +9,7 @@ import "@/styles/globals.css";
 import CustomCursor from "@/components/shared/CustomCursor";
 import { ConditionalLayout } from "@/components/ConditionalLayout";
 import { SkipLink } from "@/components/ui/SkipLink";
+import { SentryUserProvider } from "@/components/SentryUserProvider";
 
 const amiri = Amiri({
   weight: ["400", "700"],
@@ -54,6 +55,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="fr">
         <body className={`${amiri.variable} ${cormorant.variable} ${lato.variable} ${nunito.variable} antialiased`}>
+          <SentryUserProvider />
           <SkipLink />
           <CustomCursor />
           <ConditionalLayout>{children}</ConditionalLayout>

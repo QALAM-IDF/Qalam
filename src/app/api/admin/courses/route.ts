@@ -4,6 +4,7 @@ import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin";
 import { createSupabaseAdmin } from "@/lib/supabase/server";
+import * as Sentry from "@sentry/nextjs";
 
 const CreateCourseSchema = z.object({
   id: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/),
@@ -36,6 +37,10 @@ export async function GET() {
     }
     return NextResponse.json({ courses: courses ?? [] });
   } catch (error) {
+    Sentry.captureException(error, {
+      extra: { route: "/api/admin/courses", method: "GET" },
+      tags: { area: "admin" },
+    });
     console.error("GET courses error:", error);
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   }
@@ -77,6 +82,10 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({ course: data });
   } catch (error) {
+    Sentry.captureException(error, {
+      extra: { route: "/api/admin/courses", method: "POST" },
+      tags: { area: "admin" },
+    });
     console.error("POST courses error:", error);
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   }

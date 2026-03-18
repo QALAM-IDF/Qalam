@@ -8,6 +8,7 @@ import { ConfirmationEmail } from "@/lib/emails/templates/ConfirmationEmail";
 import { NotificationAdminEmail } from "@/lib/emails/templates/NotificationAdminEmail";
 import { WebhookAlertEmail } from "@/lib/emails/templates/WebhookAlertEmail";
 import { logAccess, LOG_ACTIONS } from "@/lib/logging";
+import * as Sentry from "@sentry/nextjs";
 
 const forfaitPrix: Record<string, number> = {
   decouverte: 120,
@@ -20,6 +21,12 @@ async function alertAdmin(
   details: Record<string, unknown>
 ): Promise<void> {
   try {
+    Sentry.captureException(new Error(`Stripe webhook: ${type}`), {
+      extra: details,
+      tags: { webhook_type: type },
+      level: "error",
+    });
+
     const adminEmail = process.env.CONTACT_EMAIL;
     if (!adminEmail) return;
     await sendEmail({

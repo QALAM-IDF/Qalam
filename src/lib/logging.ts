@@ -1,5 +1,6 @@
 import { createSupabaseAdmin } from "./supabase/server";
 import type { NextRequest } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 
 export async function logAccess(
   clerkUserId: string | null,
@@ -33,6 +34,13 @@ export async function logAccess(
         req?.headers.get("x-real-ip") ??
         null,
     });
+
+    if (action === LOG_ACTIONS.ACCESS_DENIED) {
+      Sentry.captureMessage(`Access denied: ${resource ?? "unknown"}`, {
+        level: "warning",
+        extra: { clerkUserId, resource, ...(metadata ?? {}) },
+      });
+    }
   } catch (error) {
     console.error("logAccess error:", error);
   }
