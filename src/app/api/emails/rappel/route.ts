@@ -1,11 +1,13 @@
 export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
+import { requireProf } from "@/lib/prof";
 import { sendEmail } from "@/lib/emails";
 import { RappelCoursEmail } from "@/lib/emails/templates/RappelCoursEmail";
 
 export async function POST(req: NextRequest) {
   try {
+    await requireProf();
     const body = await req.json().catch(() => ({}));
     const {
       email,
@@ -45,8 +47,8 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     console.error("rappel email error:", e);
     return NextResponse.json(
-      { error: "Erreur envoi email" },
-      { status: 500 }
+      { error: (e as Error)?.message === "Accès non autorisé" ? "Non autorisé" : "Erreur envoi" },
+      { status: (e as Error)?.message === "Accès non autorisé" ? 403 : 500 }
     );
   }
 }

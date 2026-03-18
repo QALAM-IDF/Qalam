@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
       .from("profiles")
       .select("email, first_name")
       .eq("clerk_user_id", p.clerk_user_id)
-      .single();
+      .maybeSingle();
     if (!profile?.email) continue;
 
     const { data: progress } = await supabase

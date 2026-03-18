@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
     .from("purchases")
     .select("id, clerk_user_id, forfait, expires_at")
     .eq("type", "mensuel")
+    .eq("status", "expired")
     .not("expires_at", "is", null);
 
   if (!purchases?.length) {
@@ -44,7 +45,7 @@ export async function GET(req: NextRequest) {
       .from("profiles")
       .select("email, first_name")
       .eq("clerk_user_id", p.clerk_user_id)
-      .single();
+      .maybeSingle();
     if (!profile?.email) continue;
 
     const { data: progress } = await supabase
