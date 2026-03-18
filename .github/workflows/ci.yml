@@ -54,3 +54,59 @@ jobs:
           STRIPE_PRICE_ESSENTIEL_MENSUEL: price_dummy
           STRIPE_PRICE_INTENSIF_UNIQUE: price_dummy
           STRIPE_PRICE_INTENSIF_MENSUEL: price_dummy
+
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: lint-and-build
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          CI: "true"
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+          NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+          ADMIN_EMAIL: admin@qalam.academy
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          CONTACT_EMAIL: contact@qalam.academy
+          CRON_SECRET: dummy-cron-secret
+          STRIPE_PRICE_DECOUVERTE_UNIQUE: price_dummy
+          STRIPE_PRICE_ESSENTIEL_UNIQUE: price_dummy
+          STRIPE_PRICE_ESSENTIEL_MENSUEL: price_dummy
+          STRIPE_PRICE_INTENSIF_UNIQUE: price_dummy
+          STRIPE_PRICE_INTENSIF_MENSUEL: price_dummy
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

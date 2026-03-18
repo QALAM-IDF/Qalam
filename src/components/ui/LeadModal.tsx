@@ -99,6 +99,9 @@ export default function LeadModal({
             }}
           >
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="lead-modal-title"
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -126,6 +129,7 @@ export default function LeadModal({
               }}
             >
               <h2
+                id="lead-modal-title"
                 style={{
                   fontFamily: "var(--font-cormorant)",
                   fontSize: "1.5rem",
