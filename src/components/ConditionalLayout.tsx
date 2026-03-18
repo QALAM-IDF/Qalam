@@ -18,6 +18,7 @@ export function ConditionalLayout({
     pathname === "/connexion" ||
     pathname === "/inscription" ||
     pathname === "/auth-redirect" ||
+    pathname === "/choisir-espace" ||
     pathname === "/choisir-forfait" ||
     pathname === "/paiement-succes" ||
     pathname === "/abonnement-expire";

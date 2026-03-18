@@ -4,6 +4,7 @@ const isProtectedRoute = createRouteMatcher([
   "/espace-membre(.*)",
   "/admin(.*)",
   "/professeur(.*)",
+  "/choisir-espace(.*)",
   "/api/progression(.*)",
   "/api/admin(.*)",
   "/api/professeur(.*)",

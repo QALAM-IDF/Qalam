@@ -13,15 +13,16 @@ export default async function AuthRedirectPage() {
   const { userId } = await auth();
   if (!userId) redirect("/connexion");
 
-  const admin = await isAdmin();
-  if (admin) redirect("/admin");
-
   try {
     await getOrCreateProfile();
   } catch {}
 
-  const role = await getUserRole(userId);
-  if (role === "professeur") redirect("/professeur");
+  const [admin, role] = await Promise.all([isAdmin(), getUserRole(userId)]);
+  const prof = role === "professeur";
+
+  if (admin && prof) redirect("/choisir-espace");
+  if (admin) redirect("/admin");
+  if (prof) redirect("/professeur");
 
   const forfait = await getUserForfait(userId).catch(() => null);
   if (forfait) redirect("/espace-membre");
