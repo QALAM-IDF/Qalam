@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { Course, ForfaitId } from "@/types";
 import { forfaitAccess } from "@/lib/courses";
-import type { Course } from "@/data/mock-courses";
 import { useMember } from "@/context/MemberContext";
 import MemberCourseCard from "@/components/membre/MemberCourseCard";
 
@@ -19,7 +19,7 @@ export default function CoursPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const byCourse = useProgressionByCourse(progression);
-  const accessibleIds = forfait ? (forfaitAccess[forfait] ?? []) : [];
+  const accessibleIds = forfait ? (forfaitAccess[forfait as ForfaitId] ?? []) : [];
 
   useEffect(() => {
     if (!forfait) {
@@ -52,13 +52,15 @@ export default function CoursPage() {
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {courses.map((course) => {
-            const accessible = accessibleIds.includes(course.id);
+            const accessible = course.forfait
+              ? accessibleIds.includes(course.forfait)
+              : false;
             const completed = byCourse[course.id] ?? 0;
             return (
               <MemberCourseCard
                 key={course.id}
                 course={course}
-                progression={{ completed, total: course.totalLessons }}
+                progression={{ completed, total: course.totalLessons ?? course.lessons.length }}
                 locked={!accessible}
               />
             );

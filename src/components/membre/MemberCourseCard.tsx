@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import type { Course } from "@/data/mock-courses";
+import type { Course } from "@/types";
 import ProgressBar from "./ProgressBar";
 import UnlockBanner from "./UnlockBanner";
 

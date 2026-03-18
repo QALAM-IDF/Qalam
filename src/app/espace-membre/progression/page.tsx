@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import type { Course, ForfaitId } from "@/types";
 import { forfaitAccess } from "@/lib/courses";
-import type { Course } from "@/data/mock-courses";
 import { useMember } from "@/context/MemberContext";
 import ProgressBar from "@/components/membre/ProgressBar";
 
@@ -26,7 +26,7 @@ export default function ProgressionPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const byCourse = useProgressionByCourse(progression);
-  const accessibleIds = forfait ? (forfaitAccess[forfait] ?? []) : [];
+  const accessibleIds = forfait ? (forfaitAccess[forfait as ForfaitId] ?? []) : [];
 
   useEffect(() => {
     if (!forfait) {
@@ -45,11 +45,9 @@ export default function ProgressionPage() {
   }, [forfait]);
 
   const totalCompleted = Object.values(byCourse).reduce((s, n) => s + n, 0);
-  let totalLessons = 0;
-  for (const id of accessibleIds) {
-    const course = courses.find((c) => c.id === id);
-    if (course) totalLessons += course.totalLessons;
-  }
+  const totalLessons = courses
+    .filter((c) => c.forfait && accessibleIds.includes(c.forfait))
+    .reduce((sum, c) => sum + (c.totalLessons ?? c.lessons.length), 0);
   const percent = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
 
   return (
@@ -105,14 +103,14 @@ export default function ProgressionPage() {
           {loading ? (
             <p style={{ color: "var(--encre-douce)" }}>Chargement…</p>
           ) : (
-            accessibleIds.map((id) => {
-              const course = courses.find((c) => c.id === id);
-              if (!course) return null;
-              const completed = byCourse[id] ?? 0;
-              const total = course.totalLessons;
-              return (
+            courses
+              .filter((c) => c.forfait && accessibleIds.includes(c.forfait))
+              .map((course) => {
+                const completed = byCourse[course.id] ?? 0;
+                const total = course.totalLessons ?? course.lessons.length;
+                return (
               <div
-                key={id}
+                key={course.id}
                 className="rounded-xl border p-6"
                 style={{
                   backgroundColor: "var(--blanc-ivoire)",
@@ -135,7 +133,7 @@ export default function ProgressionPage() {
                     </h3>
                   </div>
                   <Link
-                    href={`/espace-membre/cours/${id}`}
+                    href={`/espace-membre/cours/${course.id}`}
                     className="inline-flex rounded-full px-4 py-2 text-sm font-medium"
                     style={{
                       backgroundColor: "var(--or-brillant)",
@@ -155,8 +153,8 @@ export default function ProgressionPage() {
                 </div>
               </div>
             );
-          })
-          )}
+              })
+            )}
         </div>
       </section>
 

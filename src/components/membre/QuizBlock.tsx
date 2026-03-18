@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Check, X } from "lucide-react";
-import type { QuizQuestion } from "@/data/mock-courses";
+import type { QuizQuestion } from "@/types";
 
 type QuizBlockProps = {
   questions: QuizQuestion[];

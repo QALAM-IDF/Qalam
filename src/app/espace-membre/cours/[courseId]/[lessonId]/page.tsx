@@ -3,8 +3,9 @@
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import type { ForfaitId } from "@/types";
 import { forfaitAccess } from "@/lib/courses";
-import type { Course, Lesson } from "@/data/mock-courses";
+import type { Course, Lesson } from "@/types";
 import { useMember } from "@/context/MemberContext";
 import VideoPlayer from "@/components/membre/VideoPlayer";
 import LessonList from "@/components/membre/LessonList";
@@ -97,8 +98,8 @@ export default function LessonPage() {
     );
   }
 
-  const accessibleIds = forfait ? (forfaitAccess[forfait] ?? []) : [];
-  if (!accessibleIds.includes(courseId)) {
+  const allowedForfaits = forfait ? (forfaitAccess[forfait as ForfaitId] ?? []) : [];
+  if (!course.forfait || !allowedForfaits.includes(course.forfait)) {
     router.replace("/espace-membre");
     return null;
   }
@@ -112,13 +113,13 @@ export default function LessonPage() {
       <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
         <div className="space-y-8">
           <VideoPlayer
-            youtubeId={lesson.youtubeId}
+            youtubeId={lesson.youtubeId ?? ""}
             title={lesson.title}
-            titleAr={lesson.titleAr}
+            titleAr={lesson.titleAr ?? ""}
             duration={lesson.duration}
-            description={lesson.description}
+            description={lesson.description ?? ""}
             lessonNumber={lessonIndex}
-            totalLessons={course.totalLessons}
+            totalLessons={course.totalLessons ?? course.lessons.length}
             pdfUrl={lesson.pdfUrl}
             onComplete={() => saveProgress()}
           />

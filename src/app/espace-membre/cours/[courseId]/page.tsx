@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
+import type { ForfaitId } from "@/types";
 import { getCourseById, forfaitAccess } from "@/lib/courses";
 import { getUserForfait, getUserProgression } from "@/lib/user";
 import LessonList from "@/components/membre/LessonList";
@@ -23,14 +24,17 @@ export default async function CourseDetailPage({ params }: Props) {
 
   if (!course) notFound();
 
-  const accessibleIds = forfait ? (forfaitAccess[forfait] ?? []) : [];
-  const accessible = accessibleIds.includes(courseId);
+  const allowedForfaits = forfait ? (forfaitAccess[forfait as ForfaitId] ?? []) : [];
+  const accessible = course.forfait && allowedForfaits.includes(course.forfait);
   if (!accessible) notFound();
 
   const completedCount = progression.filter(
     (p) => p.course_id === courseId && p.completed
   ).length;
-  const prog = { completed: completedCount, total: course.totalLessons };
+  const prog = {
+    completed: completedCount,
+    total: course.totalLessons ?? course.lessons.length,
+  };
 
   const completedSet = new Set(
     progression

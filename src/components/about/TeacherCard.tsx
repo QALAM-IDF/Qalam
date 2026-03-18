@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import type { Teacher } from "@/data/teachers";
 
@@ -39,16 +40,31 @@ export default function TeacherCard({
         }}
       >
         <div className="flex items-center gap-4 p-4">
-          <div
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 text-lg font-semibold"
-            style={{
-              background: gradient,
-              borderColor: "var(--or-brillant)",
-              color: "var(--blanc-ivoire)",
-            }}
-          >
-            {teacher.avatarInitials}
-          </div>
+          {teacher.avatarUrl ? (
+            <div
+              className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border-2"
+              style={{ borderColor: "var(--or-brillant)" }}
+            >
+              <Image
+                src={teacher.avatarUrl}
+                alt={`Photo de ${teacher.name}`}
+                fill
+                sizes="56px"
+                style={{ objectFit: "cover" }}
+              />
+            </div>
+          ) : (
+            <div
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 text-lg font-semibold"
+              style={{
+                background: gradient,
+                borderColor: "var(--or-brillant)",
+                color: "var(--blanc-ivoire)",
+              }}
+            >
+              {teacher.avatarInitials}
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <p className="font-display text-lg" style={{ color: "var(--encre-noire)" }}>
               {teacher.name}
@@ -83,16 +99,31 @@ export default function TeacherCard({
         className="relative flex h-[40%] min-h-[140px] items-center justify-center"
         style={{ background: gradient }}
       >
-        <div
-          className="flex h-20 w-20 items-center justify-center rounded-full border-2 text-2xl font-semibold"
-          style={{
-            backgroundColor: "rgba(212, 175, 55, 0.2)",
-            borderColor: "var(--or-brillant)",
-            color: "var(--blanc-ivoire)",
-          }}
-        >
-          {teacher.avatarInitials}
-        </div>
+        {teacher.avatarUrl ? (
+          <div
+            className="relative h-20 w-20 overflow-hidden rounded-full border-2"
+            style={{ borderColor: "var(--or-brillant)" }}
+          >
+            <Image
+              src={teacher.avatarUrl}
+              alt={`Photo de ${teacher.name}`}
+              fill
+              sizes="80px"
+              style={{ objectFit: "cover" }}
+            />
+          </div>
+        ) : (
+          <div
+            className="flex h-20 w-20 items-center justify-center rounded-full border-2 text-2xl font-semibold"
+            style={{
+              backgroundColor: "rgba(212, 175, 55, 0.2)",
+              borderColor: "var(--or-brillant)",
+              color: "var(--blanc-ivoire)",
+            }}
+          >
+            {teacher.avatarInitials}
+          </div>
+        )}
       </div>
       <div className="flex flex-1 flex-col p-5">
         <p className="font-display text-xl font-semibold" style={{ color: "var(--encre-noire)" }}>

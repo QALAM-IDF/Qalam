@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import type { ForfaitId } from "@/types";
 import { getCourseById, forfaitAccess } from "@/lib/courses";
 import { getUserForfait, getUserRole } from "@/lib/user";
 import { isAdmin } from "@/lib/admin";
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest, { params }: Params) {
     if (!course) {
       return NextResponse.json({ error: "Cours introuvable" }, { status: 404 });
     }
-    const allowed = forfaitAccess[forfait] ?? [];
+    const allowed = forfaitAccess[forfait as ForfaitId] ?? [];
     if (!allowed.includes(course.forfait)) {
       await logAccess(userId, LOG_ACTIONS.ACCESS_DENIED, `course:${courseId}`, req);
       return NextResponse.json({ error: "Accès non autorisé à ce cours" }, { status: 403 });

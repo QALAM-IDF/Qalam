@@ -1,13 +1,8 @@
 import { createSupabaseAdmin } from "./supabase/server";
-import type { Course, Lesson } from "@/data/mock-courses";
+import type { Course, Lesson } from "@/types";
+import { forfaitAccess } from "@/types";
 
-const access: Record<string, string[]> = {
-  decouverte: ["decouverte"],
-  essentiel: ["decouverte", "essentiel"],
-  intensif: ["decouverte", "essentiel", "intensif"],
-};
-
-export const forfaitAccess: Record<string, string[]> = access;
+export { forfaitAccess };
 
 type DbLesson = {
   id: string;
@@ -66,7 +61,7 @@ function mapCourse(c: DbCourse): Course {
 
 export async function getCoursesByForfait(forfait: string): Promise<Course[]> {
   const supabase = createSupabaseAdmin();
-  const forfaits = access[forfait] ?? [];
+  const forfaits = forfaitAccess[forfait as keyof typeof forfaitAccess] ?? [];
 
   const { data, error } = await supabase
     .from("courses")

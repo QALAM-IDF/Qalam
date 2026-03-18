@@ -15,6 +15,8 @@ export type Teacher = {
   };
   diplomes: string[];
   youtubeId?: string;
+  /** URL de la photo du professeur — si fournie, affichée via next/image */
+  avatarUrl?: string;
   avatarInitials: string;
   avatarTheme: "hommes" | "femmes" | "coranique";
   experience: string;

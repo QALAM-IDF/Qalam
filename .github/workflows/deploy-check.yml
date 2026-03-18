@@ -1,0 +1,17 @@
+name: Deploy Check
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  notify:
+    name: Post-deploy notification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Vercel deployment
+        run: |
+          echo "✅ Push sur main — Vercel déploie automatiquement"
+          echo "🔗 URL: https://qalam-lovat.vercel.app"
+          echo "📊 Dashboard: https://vercel.com/dashboard"

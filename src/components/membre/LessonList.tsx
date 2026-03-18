@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { Check, Circle } from "lucide-react";
-import type { Lesson } from "@/data/mock-courses";
+import type { Lesson } from "@/types";
 
 type LessonListProps = {
   lessons: Lesson[];

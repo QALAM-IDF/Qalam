@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import type { Course, ForfaitId } from "@/types";
 import { forfaitAccess } from "@/lib/courses";
-import type { Course } from "@/data/mock-courses";
 import { useMember } from "@/context/MemberContext";
 import MemberCourseCard from "@/components/membre/MemberCourseCard";
 import ProgressBar from "@/components/membre/ProgressBar";
@@ -35,7 +35,7 @@ export default function EspaceMembrePage() {
   const [coursesLoading, setCoursesLoading] = useState(true);
   const progression = rawProgression ?? [];
   const byCourse = useProgressionByCourse(progression);
-  const accessibleIds = forfait ? (forfaitAccess[forfait] ?? []) : [];
+  const accessibleIds = forfait ? (forfaitAccess[forfait as ForfaitId] ?? []) : [];
 
   useEffect(() => {
     if (!forfait) {
@@ -55,13 +55,11 @@ export default function EspaceMembrePage() {
 
   const lastIncomplete = (() => {
     if (coursesLoading || !courses.length) return null;
-    for (const courseId of accessibleIds) {
-      const course = courses.find((c) => c.id === courseId);
-      if (!course) continue;
-      const set = byCourse[courseId]?.lessonIds;
-      const firstIncomplete = course.lessons.find(
-        (l) => !set?.has(l.id)
-      );
+    const allowed = forfait ? (forfaitAccess[forfait as ForfaitId] ?? []) : [];
+    for (const course of courses) {
+      if (!course.forfait || !allowed.includes(course.forfait)) continue;
+      const set = byCourse[course.id]?.lessonIds;
+      const firstIncomplete = course.lessons.find((l) => !set?.has(l.id));
       if (firstIncomplete) {
         return { course, lesson: firstIncomplete };
       }
@@ -174,13 +172,15 @@ export default function EspaceMembrePage() {
             <p style={{ color: "var(--encre-douce)" }}>Chargement des cours…</p>
           ) : (
             courses.map((course) => {
-              const accessible = accessibleIds.includes(course.id);
+              const accessible = course.forfait
+                ? accessibleIds.includes(course.forfait)
+                : false;
               const prog = byCourse[course.id] ?? {
                 completed: 0,
-                total: course.totalLessons,
+                total: course.totalLessons ?? course.lessons.length,
                 lessonIds: new Set<string>(),
               };
-              const total = course.totalLessons;
+              const total = course.totalLessons ?? course.lessons.length;
               const courseWithProgress = {
                 ...course,
                 lessons: course.lessons.map((l) => ({
@@ -212,14 +212,19 @@ export default function EspaceMembrePage() {
           Ma progression globale
         </h2>
         <div className="mt-6 space-y-4">
-          {accessibleIds.map((id) => {
-            const course = courses.find((c) => c.id === id);
-            if (!course) return null;
-            const prog = byCourse[id] ?? { completed: 0, lessonIds: new Set<string>() };
-            const total = course.totalLessons;
-            return (
+          {courses
+            .filter(
+              (c) => c.forfait && accessibleIds.includes(c.forfait)
+            )
+            .map((course) => {
+              const prog = byCourse[course.id] ?? {
+                completed: 0,
+                lessonIds: new Set<string>(),
+              };
+              const total = course.totalLessons ?? course.lessons.length;
+              return (
               <div
-                key={id}
+                key={course.id}
                 className="rounded-xl border p-4"
                 style={{
                   borderColor: "var(--or-brillant)",
@@ -249,8 +254,9 @@ export default function EspaceMembrePage() {
                   />
                 </div>
               </div>
-            );
-          })}
+              );
+            })
+        }
         </div>
       </section>
 
