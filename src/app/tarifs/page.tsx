@@ -64,12 +64,22 @@ export default function TarifsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedForfaitName, setSelectedForfaitName] = useState<string>("");
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
-  const [tab, setTab] = useState<TarifTab>("hommes");
+  const [activeTab, setActiveTab] = useState<TarifTab>("hommes");
 
-  const openModal = (forfaitName: string) => {
-    setSelectedForfaitName(forfaitName);
+  const handleSelect = (forfaitIdOrName: string) => {
+    const forfait = [...forfaitsByCategorie.hommes, ...forfaitsByCategorie.femmes, ...forfaitsByCategorie.enfants, ...forfaitsParticulier].find(
+      (f) => f.id === forfaitIdOrName || f.name === forfaitIdOrName
+    );
+    setSelectedForfaitName(forfait?.name ?? forfaitIdOrName);
     setModalOpen(true);
   };
+
+  const tabs = [
+    { id: "hommes" as const, label: "Hommes" },
+    { id: "femmes" as const, label: "Femmes" },
+    { id: "enfants" as const, label: "Enfants" },
+    { id: "particulier" as const, label: "Cours Particuliers" },
+  ];
 
   return (
     <main id="main-content" className="overflow-hidden bg-[var(--beige-creme)] pt-20">
@@ -117,67 +127,216 @@ export default function TarifsPage() {
 
       <section className="section-shell py-12 md:py-16">
         <div className="flex flex-wrap justify-center gap-2 mb-10">
-          {(["hommes", "femmes", "enfants", "particulier"] as const).map((t) => (
+          {tabs.map((t) => (
             <button
-              key={t}
+              key={t.id}
               type="button"
-              onClick={() => setTab(t)}
-              className="px-5 py-2.5 rounded-full font-body text-sm font-medium transition-all"
+              onClick={() => setActiveTab(t.id)}
+              className="px-5 py-2 rounded-full font-body text-sm transition-all"
               style={{
-                background: tab === t ? "var(--or-brillant)" : "var(--beige-chaud)",
-                color: tab === t ? "var(--encre-noire)" : "var(--encre-douce)",
+                background: activeTab === t.id ? "var(--or-brillant)" : "var(--beige-chaud)",
+                color: activeTab === t.id ? "var(--encre-noire)" : "var(--encre-douce)",
+                fontWeight: activeTab === t.id ? 700 : 400,
+                border: activeTab === t.id ? "2px solid var(--or-brillant)" : "1px solid var(--beige-profond)",
               }}
             >
-              {t === "hommes" ? "Hommes" : t === "femmes" ? "Femmes" : t === "enfants" ? "Enfants" : "Cours Particuliers"}
+              {t.label}
             </button>
           ))}
         </div>
-        <motion.div
-          key={tab}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col gap-6 md:grid md:max-w-6xl md:gap-8 md:mx-auto"
-          style={{ gridTemplateColumns: tab === "particulier" ? "repeat(2, 1fr)" : undefined }}
-        >
-          {tab === "enfants" && (
-            <>
-              <div className="md:col-span-full mb-4">
-                <p className="text-center font-arabic text-2xl text-[var(--or-luxe)]">طريقة الأطفال</p>
-                <h2 className="mt-2 text-center font-display text-2xl text-[var(--encre-noire)]">Méthode Kids</h2>
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
-                  {methodeKidsCards.map((card) => (
-                    <div
-                      key={card.title}
-                      className="rounded-2xl border-2 p-5 text-center"
-                      style={{ borderColor: card.color, backgroundColor: "var(--blanc-ivoire)" }}
-                    >
-                      <card.icon className="mx-auto h-10 w-10 mb-2" style={{ color: card.color }} />
-                      <h3 className="font-display text-lg text-[var(--encre-noire)]">{card.title}</h3>
-                      <p className="text-sm mt-1 text-[var(--encre-douce)]">{card.desc}</p>
-                    </div>
-                  ))}
+
+        {activeTab === "hommes" && (
+          <motion.div
+            key="hommes"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl p-8 mb-8"
+            style={{ background: "var(--desert-horizon)", border: "1px solid var(--desert-ambre)" }}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto px-4">
+              {forfaitsByCategorie.hommes.map((f) => (
+                <ForfaitCard key={f.id} forfait={f} theme="hommes" compact onSelect={() => handleSelect(f.name)} />
+              ))}
+              {forfaitsParticulier[0] && (
+                <ForfaitCard
+                  forfait={forfaitsParticulier[0]}
+                  theme="hommes"
+                  compact
+                  onSelect={() => handleSelect(forfaitsParticulier[0].name)}
+                />
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === "femmes" && (
+          <motion.div
+            key="femmes"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl p-8 mb-8"
+            style={{ background: "var(--andalou-ivoire)", border: "1px solid var(--andalou-brique)" }}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto px-4">
+              {forfaitsByCategorie.femmes.map((f) => (
+                <ForfaitCard key={f.id} forfait={f} theme="femmes" compact onSelect={() => handleSelect(f.name)} />
+              ))}
+              {forfaitsParticulier[1] && (
+                <ForfaitCard
+                  forfait={forfaitsParticulier[1]}
+                  theme="femmes"
+                  compact
+                  onSelect={() => handleSelect(forfaitsParticulier[1].name)}
+                />
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === "enfants" && (
+          <motion.div
+            key="enfants"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-5xl mx-auto px-4"
+          >
+            <div className="mb-10">
+              <p className="text-center font-arabic text-2xl text-[var(--or-luxe)]">طريقة الأطفال</p>
+              <h2 className="mt-2 text-center font-display text-2xl text-[var(--encre-noire)]">Méthode Kids</h2>
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                {methodeKidsCards.map((card) => (
+                  <div
+                    key={card.title}
+                    className="rounded-2xl border-2 p-5 text-center"
+                    style={{ borderColor: card.color, backgroundColor: "var(--blanc-ivoire)" }}
+                  >
+                    <card.icon className="mx-auto h-10 w-10 mb-2" style={{ color: card.color }} />
+                    <h3 className="font-display text-lg text-[var(--encre-noire)]">{card.title}</h3>
+                    <p className="text-sm mt-1 text-[var(--encre-douce)]">{card.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <CalligraphyDivider className="mx-auto my-10 w-48" />
+
+            <div className="mb-12">
+              <div className="text-center mb-6">
+                <span
+                  className="inline-block px-5 py-1.5 rounded-full font-display text-lg mb-2"
+                  style={{
+                    background: "var(--magie-indigo)",
+                    color: "var(--magie-or)",
+                    border: "1px solid var(--magie-or)",
+                  }}
+                >
+                  ✨ 5 – 8 ans
+                </span>
+                <p className="font-arabic text-xl" style={{ color: "var(--or-luxe)" }}>
+                  المبتدئون الصغار
+                </p>
+                <p className="font-body text-sm mt-1" style={{ color: "var(--encre-douce)" }}>
+                  Alphabet et mots simples en contexte ludique · Cycle 8 semaines
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <div className="w-full max-w-sm">
+                  {forfaitsByCategorie.enfants.find((f) => f.id === "enfant-5-8") && (
+                    <ForfaitCard
+                      forfait={forfaitsByCategorie.enfants.find((f) => f.id === "enfant-5-8")!}
+                      theme="default"
+                      compact
+                      onSelect={() => handleSelect("enfant-5-8")}
+                    />
+                  )}
                 </div>
               </div>
-              {forfaitsByCategorie.enfants.map((f) => (
-                <ForfaitCard
-                  key={f.id}
-                  forfait={f}
-                  theme="enfants"
-                  onSelect={() => openModal(f.name)}
-                />
-              ))}
-            </>
-          )}
-          {tab === "hommes" && forfaitsByCategorie.hommes.map((f) => (
-            <ForfaitCard key={f.id} forfait={f} theme="hommes" onSelect={() => openModal(f.name)} />
-          ))}
-          {tab === "femmes" && forfaitsByCategorie.femmes.map((f) => (
-            <ForfaitCard key={f.id} forfait={f} theme="femmes" onSelect={() => openModal(f.name)} />
-          ))}
-          {tab === "particulier" && forfaitsParticulier.map((f) => (
-            <ForfaitCard key={f.id} forfait={f} theme="default" onSelect={() => openModal(f.name)} />
-          ))}
-        </motion.div>
+            </div>
+
+            <CalligraphyDivider className="mx-auto my-8 w-36 opacity-40" />
+
+            <div className="mb-12">
+              <div className="text-center mb-6">
+                <span
+                  className="inline-block px-5 py-1.5 rounded-full font-display text-lg mb-2"
+                  style={{
+                    background: "var(--magie-marine)",
+                    color: "var(--magie-turquoise)",
+                    border: "1px solid var(--magie-turquoise)",
+                  }}
+                >
+                  🌟 9 – 12 ans
+                </span>
+                <p className="font-arabic text-xl" style={{ color: "var(--or-luxe)" }}>
+                  المتوسطون
+                </p>
+                <p className="font-body text-sm mt-1" style={{ color: "var(--encre-douce)" }}>
+                  Phrases complètes, histoires, dialogue et lecture · Cycle 10 semaines
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <div className="w-full max-w-sm">
+                  {forfaitsByCategorie.enfants.find((f) => f.id === "enfant-9-12") && (
+                    <ForfaitCard
+                      forfait={forfaitsByCategorie.enfants.find((f) => f.id === "enfant-9-12")!}
+                      theme="default"
+                      compact
+                      onSelect={() => handleSelect("enfant-9-12")}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <CalligraphyDivider className="mx-auto my-8 w-36 opacity-40" />
+
+            <div className="mb-12">
+              <div className="text-center mb-6">
+                <span
+                  className="inline-block px-5 py-1.5 rounded-full font-display text-lg mb-2"
+                  style={{
+                    background: "var(--desert-horizon)",
+                    color: "var(--desert-ambre)",
+                    border: "1px solid var(--desert-ambre)",
+                  }}
+                >
+                  🎓 13 – 15 ans
+                </span>
+                <p className="font-arabic text-xl" style={{ color: "var(--or-luxe)" }}>
+                  المتقدمون
+                </p>
+                <p className="font-body text-sm mt-1" style={{ color: "var(--encre-douce)" }}>
+                  Expression orale, écriture structurée et récitation · Cycle 12 semaines
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <div className="w-full max-w-sm">
+                  {forfaitsByCategorie.enfants.find((f) => f.id === "enfant-13-15") && (
+                    <ForfaitCard
+                      forfait={forfaitsByCategorie.enfants.find((f) => f.id === "enfant-13-15")!}
+                      theme="default"
+                      compact
+                      onSelect={() => handleSelect("enfant-13-15")}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === "particulier" && (
+          <motion.div
+            key="particulier"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto px-4"
+          >
+            {forfaitsParticulier.map((f) => (
+              <ForfaitCard key={f.id} forfait={f} theme="default" compact onSelect={() => handleSelect(f.name)} />
+            ))}
+          </motion.div>
+        )}
       </section>
 
       <section className="section-shell py-12 md:py-16">

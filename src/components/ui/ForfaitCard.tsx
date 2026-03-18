@@ -2,38 +2,15 @@
 
 import { motion } from "framer-motion";
 import { Clock, User, Users, Video, Calendar, Check } from "lucide-react";
-import type { Forfait, ForfaitType } from "@/data/forfaits";
+import type { Forfait } from "@/data/forfaits";
 import CalligraphyDivider from "@/components/shared/CalligraphyDivider";
 import { useMobile } from "@/hooks/useMobile";
-
-function FormatBadge({ format }: { format: ForfaitType }) {
-  const config: Record<ForfaitType, { label: string; color: string }> = {
-    youtube: { label: "🎬 Vidéos YouTube", color: "#ff0000" },
-    zoom: { label: "📹 Zoom en direct", color: "#2D8CFF" },
-    "youtube-zoom": { label: "🎬 YouTube + 📹 Zoom", color: "#b8860b" },
-  };
-  const { label, color } = config[format];
-  return (
-    <span
-      style={{
-        padding: "2px 10px",
-        borderRadius: 20,
-        fontSize: "0.75rem",
-        background: `${color}15`,
-        color,
-        border: `1px solid ${color}40`,
-        fontWeight: 600,
-      }}
-    >
-      {label}
-    </span>
-  );
-}
 
 type ForfaitCardProps = {
   forfait: Forfait;
   theme?: "default" | "hommes" | "femmes" | "enfants";
   onSelect?: () => void;
+  compact?: boolean;
 };
 
 const themeStyles: Record<
@@ -70,7 +47,7 @@ const themeStyles: Record<
   },
 };
 
-export default function ForfaitCard({ forfait, theme = "default", onSelect }: ForfaitCardProps) {
+export default function ForfaitCard({ forfait, theme = "default", onSelect, compact = false }: ForfaitCardProps) {
   const isMobile = useMobile(768);
   const styles = themeStyles[theme];
   const isIndividuel = forfait.groupSize.toLowerCase().includes("individuel");
@@ -83,7 +60,7 @@ export default function ForfaitCard({ forfait, theme = "default", onSelect }: Fo
       transition={{ duration: 0.4 }}
       whileHover={{ y: -6, transition: { duration: 0.2 } }}
       animate={{ scale: forfait.highlighted ? (isMobile ? 1.01 : 1.03) : 1 }}
-      className="relative w-full overflow-hidden rounded-2xl border-2 p-6 md:rounded-3xl"
+      className={`relative w-full overflow-hidden border-2 ${compact ? "rounded-[14px] p-5 md:p-5" : "rounded-2xl p-6 md:rounded-3xl"}`}
       style={{
         backgroundColor: styles.bg,
         borderColor: styles.border,
@@ -99,14 +76,11 @@ export default function ForfaitCard({ forfait, theme = "default", onSelect }: Fo
         </div>
       )}
 
-      <header className="mb-4">
-        <div className="mb-2">
-          <FormatBadge format={forfait.format} />
-        </div>
-        <p className="font-arabic text-3xl leading-none md:text-4xl" style={{ color: styles.accentText }}>
+      <header className={compact ? "mb-3" : "mb-4"}>
+        <p className={`font-arabic leading-none ${compact ? "text-2xl" : "text-3xl md:text-4xl"}`} style={{ color: styles.accentText }}>
           {forfait.nameAr}
         </p>
-        <h3 className="mt-1 font-display text-2xl" style={{ color: styles.accentText }}>
+        <h3 className={`mt-1 font-display ${compact ? "text-xl" : "text-2xl"}`} style={{ color: styles.accentText }}>
           {forfait.name}
         </h3>
         <p className="mt-1 text-sm italic opacity-90" style={{ color: styles.accentText }}>
@@ -114,21 +88,21 @@ export default function ForfaitCard({ forfait, theme = "default", onSelect }: Fo
         </p>
       </header>
 
-      <div className="mb-4" style={{ color: styles.accentText }}>
-        <span className="font-display text-5xl font-semibold">{forfait.price}</span>
-        <span className="text-2xl">€</span>
+      <div className={compact ? "mb-3" : "mb-4"} style={{ color: styles.accentText }}>
+        <span className={`font-display font-semibold ${compact ? "text-4xl" : "text-5xl"}`}>{forfait.price}</span>
+        <span className={compact ? "text-xl" : "text-2xl"}>€</span>
         {forfait.priceLabel && (
           <p className="mt-0.5 text-sm opacity-90">{forfait.priceLabel}</p>
         )}
       </div>
 
       <CalligraphyDivider
-        className="mb-4 h-5 w-full min-w-[120px]"
+        className={`w-full min-w-[120px] ${compact ? "mb-3 h-4" : "mb-4 h-5"}`}
         color={styles.accent}
         compact
       />
 
-      <ul className="mb-6 space-y-2 text-sm" style={{ color: styles.accentText }}>
+      <ul className={`space-y-1.5 text-sm ${compact ? "mb-4" : "mb-6 space-y-2"}`} style={{ color: styles.accentText }}>
         <li className="flex items-center gap-2">
           <Clock className="h-4 w-4 shrink-0" style={{ color: styles.accent }} />
           <span>{forfait.hours}h de cours</span>
@@ -151,7 +125,7 @@ export default function ForfaitCard({ forfait, theme = "default", onSelect }: Fo
         </li>
       </ul>
 
-      <ul className="mb-6 space-y-2 text-sm" style={{ color: styles.accentText }}>
+      <ul className={`space-y-1.5 text-sm ${compact ? "mb-4" : "mb-6 space-y-2"}`} style={{ color: styles.accentText }}>
         {forfait.features.map((feature) => (
           <li key={feature} className="flex items-start gap-2">
             <Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: styles.accent }} />
@@ -163,7 +137,7 @@ export default function ForfaitCard({ forfait, theme = "default", onSelect }: Fo
       <button
         type="button"
         onClick={onSelect}
-        className="w-full rounded-full py-3 text-sm font-semibold transition-opacity hover:opacity-90"
+        className={`w-full rounded-full text-sm font-semibold transition-opacity hover:opacity-90 ${compact ? "py-3" : "py-3"}`}
         style={{ backgroundColor: styles.accent, color: theme === "hommes" || theme === "enfants" ? "var(--encre-noire)" : "var(--blanc-ivoire)" }}
       >
         Je m&apos;inscris
